@@ -10,165 +10,225 @@ import { WeixinUtil } from '@utils/weixin.util';
 import { ConfigService } from 'src/config/config.service';
 import { LoginDTO } from './login.dto';
 import { PaginationUtil } from 'src/utils/pagination.util';
-import { VipService } from '../vip/vip.service';
 import { RedisService } from 'nestjs-redis';
+import { VerifyDTO } from './users.dto';
+import { CryptoUtil } from 'src/utils/crypto.util';
+import * as moment from 'moment';
 
 @Injectable()
 export class UserService {
-  // 注入的UserModelToken要与users.providers.ts里面的key一致就可以
-  constructor(
-    @Inject('UserModelToken') private readonly userModel: Model<IUser>,
-    @Inject(WeixinUtil) private readonly weixinUtil: WeixinUtil,
-    @Inject(JwtService) private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
-    @Inject(PaginationUtil) private readonly paginationUtil: PaginationUtil,
-    @Inject(VipService) private readonly vipService: VipService,
-    private redis: RedisService,
-  ) { }
+	// 注入的UserModelToken要与users.providers.ts里面的key一致就可以
+	constructor(
+		@Inject('UserModelToken') private readonly userModel: Model<IUser>,
+		@Inject(WeixinUtil) private readonly weixinUtil: WeixinUtil,
+		@Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
+		@Inject(JwtService) private readonly jwtService: JwtService,
+		private readonly configService: ConfigService,
+		@Inject(PaginationUtil) private readonly paginationUtil: PaginationUtil,
+		private redis: RedisService,
+	) {}
 
-  // 根据id查询
-  async findById(_id: string): Promise<IUser | null> {
-    return await this.userModel
-      .findById(_id)
-      .lean()
-      .exec();
-  }
+	// 根据id查询
+	async findById(_id: string): Promise<IUser | null> {
+		return await this.userModel
+			.findById(_id)
+			.lean()
+			.exec();
+	}
+	// 根据积分地址查询
+	async findByIntegrationAddress(integrationAddress: string): Promise<IUser> {
+		const data = await this.userModel
+			.findOne({ integrationAddress })
+			.lean()
+			.exec();
+		if (!data) {
+			throw new ApiException('积分地址有误', ApiErrorCode.NO_EXIST, 404);
+		}
+		return data;
+	}
 
-  // 用户列表
-  async list(pagination: Pagination): Promise<IList<IUser>> {
-    const condition = this.paginationUtil.genCondition(pagination, ['nickname'])
-    const list = await this.userModel
-      .find(condition)
-      .limit(pagination.pageSize)
-      .skip((pagination.current - 1) * pagination.pageSize)
-      .sort({ createdAt: -1 })
-      .lean()
-      .exec();
-    const total = await this.userModel.countDocuments(condition);
-    return { list, total };
-  }
+	// 用户列表
+	async list(pagination: Pagination, inviteBy?: string): Promise<IList<IUser>> {
+		const condition = this.paginationUtil.genCondition(pagination, [
+			'nickname',
+			'phone',
+		]);
+		if (inviteBy) {
+			condition.inviteBy = inviteBy;
+		}
+		const list = await this.userModel
+			.find(condition)
+			.limit(pagination.pageSize)
+			.skip((pagination.current - 1) * pagination.pageSize)
+			.sort({ createdAt: -1 })
+			.lean()
+			.exec();
+		const total = await this.userModel.countDocuments(condition);
+		return { list, total };
+	}
 
-  // 根据id修改
-  async updateById(_id: any, user: any) {
-    return await this.userModel.findByIdAndUpdate(_id, user).exec();
-  }
+	// 根据id修改
+	async updateById(_id: any, user: any) {
+		return await this.userModel.findByIdAndUpdate(_id, user).exec();
+	}
 
-  async loginByWeixin(login: LoginDTO, ip: string): Promise<any> {
-    let newUser: any = null
-    // 解释用户数据
-    const userInfo = await this.weixinUtil.login(login.code, login);
-    if (!userInfo) {
-      throw new ApiException('登录失败', ApiErrorCode.LOGIN_ERROR, 406);
-    }
-    // 根据openid查找用户是否已经注册
-    let user: IUser = await this.userModel.findOne({ weixinOpenid: userInfo.openId }).lean().exec();
-    if (!user) {
+	async loginByWeixin(login: LoginDTO, ip: string): Promise<any> {
+		// 解释用户数据
+		const userInfo = await this.weixinUtil.login(login.code, login);
+		if (!userInfo) {
+			throw new ApiException('登录失败', ApiErrorCode.LOGIN_ERROR, 406);
+		}
+		if (login.inviteBy) {
+			const inviteCheck = await this.userModel.findById(login.inviteBy);
+			if (!inviteCheck) {
+				throw new ApiException('邀请人不存在', ApiErrorCode.NO_EXIST, 404);
+			}
+		}
+		// 根据openid查找用户是否已经注册
+		let user: IUser = await this.userModel
+			.findOne({ weixinOpenid: userInfo.openId })
+			.select({
+				// 姓名
+				realName: 0,
+				// 手机号
+				phone: 0,
+				// 身份证
+				cardNumber: 0,
+				// 银行卡
+				bankCard: 0,
+				// 银行
+				bank: 0,
+				// 开户行
+				bankAddress: 0,
+				// 积分地址
+				integrationAddress: 0,
+			})
+			.lean()
+			.exec();
+		if (!user) {
+			// 注册
+			user = await this.userModel.create({
+				registerTime: Date.now(),
+				registerIp: ip,
+				weixinOpenid: userInfo.openId,
+				avatar: userInfo.avatarUrl || '',
+				gender: userInfo.gender || 0, // 性别 0：未知、1：男、2：女
+				nickname: userInfo.nickName,
+				integrationAddress: this.cryptoUtil.createBitcoinAddress(),
+				inviteBy: login.inviteBy,
+			});
+			const client = this.redis.getClient();
+			await client.hincrby('dataRecord', 'users', 1);
+		}
+		// 更新登录信息
+		await this.userModel.findByIdAndUpdate(user._id, {
+			lastLoginTime: Date.now(),
+			lastLoginIp: ip,
+		});
 
-      // 注册
-      user = await this.userModel.create({
-        registerTime: Date.now(),
-        registerIp: ip,
-        weixinOpenid: userInfo.openId,
-        avatar: userInfo.avatarUrl || '',
-        gender: userInfo.gender || 0, // 性别 0：未知、1：男、2：女
-        nickname: userInfo.nickName,
-      });
-      newUser = user._id
-      const client = this.redis.getClient()
-      await client.hincrby('dataRecord', 'users', 1)
-    }
-    // 更新登录信息
-    await this.userModel.findByIdAndUpdate(user._id, {
-      lastLoginTime: Date.now(),
-      lastLoginIp: ip,
-    });
+		const accessToken = await this.jwtService.sign({
+			id: user._id,
+			type: 'user',
+		});
 
-    const accessToken = await this.jwtService.sign({ id: user._id, type: 'user' });
+		if (!user || !accessToken) {
+			throw new ApiException('登录失败', ApiErrorCode.LOGIN_ERROR, 406);
+		}
+		delete user.weixinOpenid;
 
-    if (!user || !accessToken) {
-      throw new ApiException('登录失败', ApiErrorCode.LOGIN_ERROR, 406);
-    }
-    delete user.weixinOpenid
+		return { userinfo: user, accessToken };
+	}
 
-    return { userinfo: user, accessToken, newUser };
-  }
+	async block(id: string, admin: string) {
+		await this.userModel.findByIdAndUpdate(id, {
+			isBlock: true,
+			blockTime: new Date(),
+			blockBy: admin,
+		});
+		return;
+	}
 
-  async block(id: string, admin: string) {
-    return await this.userModel.findByIdAndUpdate(id, {
-      isBlock: true,
-      blockTime: new Date(),
-      blockBy: admin,
-    })
-  }
+	async unblock(id: string, admin: string) {
+		await this.userModel.findByIdAndUpdate(id, {
+			unBlockBy: admin,
+			isBlock: false,
+			$unset: { blockTime: 1 },
+		});
+		return;
+	}
 
-  async unblock(id: string, admin: string) {
-    return await this.userModel.findByIdAndUpdate(id, {
-      unBlockBy: admin,
-      isBlock: false,
-      $unset: { blockTime: 1 },
-    })
-  }
+	// 修改余额
+	async incBalance(id: string, inc: number) {
+		const user = await this.userModel.findById(id);
+		if (!user) {
+			throw new ApiException('无该用户', ApiErrorCode.NO_EXIST, 404);
+		}
+		const newBalance = Number((user.balance + inc).toFixed(2));
+		await this.userModel.findByIdAndUpdate(id, {
+			balance: newBalance,
+		});
+		return;
+	}
 
-  // 修改余额
-  async incBalance(id: string, inc: number) {
-    const user = await this.userModel.findById(id)
-    if (!user) {
-      throw new ApiException('无该用户', ApiErrorCode.NO_EXIST, 404)
-    }
-    const newBalance = Number((user.balance + inc).toFixed(2))
-    return await this.userModel.findByIdAndUpdate(id, {
-      balance: newBalance,
-    })
-  }
+	// 修改剩余积分
+	async incIntegration(id: string, inc: number) {
+		const user = await this.userModel.findById(id);
+		if (!user) {
+			throw new ApiException('无该用户', ApiErrorCode.NO_EXIST, 404);
+		}
+		const integration = Number(user.integration + inc).toFixed(3);
+		await this.userModel.findByIdAndUpdate(id, { integration });
+		return;
+	}
 
-  // 修改剩余积分
-  async incIntegration(id: string, inc: number) {
-    const user = await this.userModel.findById(id)
-    if (!user) {
-      throw new ApiException('无该用户', ApiErrorCode.NO_EXIST, 404)
-    }
-    let integrationTotal = user.integrationTotal
-    const incUpdate: any = { integration: inc }
-    let vip: any = null
-    if (inc > 0) {
-      incUpdate.integrationTotal = inc
-      integrationTotal += inc
-      vip = await this.vipService.findByIntegration(integrationTotal)
-    }
-    const update: any = { $inc: incUpdate }
-    if (vip) {
-      update.vip = vip.level
-    }
-    return await this.userModel.findByIdAndUpdate(id, update)
-  }
+	// 统计数量
+	async countByCondition(condition: any) {
+		return await this.userModel.countDocuments(condition);
+	}
 
-  // 修改剩余积分
-  async refundIntegration(id: string, inc: number) {
-    const user = await this.userModel.findById(id)
-    if (!user) {
-      throw new ApiException('无该用户', ApiErrorCode.NO_EXIST, 404)
-    }
-    let integrationTotal = user.integrationTotal
-    const incUpdate: any = { integration: inc }
-    let vip: any = null
-    if (inc < 0) {
-      incUpdate.integrationTotal = inc
-      integrationTotal += inc
-      vip = await this.vipService.findByIntegration(integrationTotal)
-      if (!vip) {
-        vip = { level: 1 }
-      }
-    }
-    const update: any = { $inc: incUpdate }
-    if (vip) {
-      update.vip = vip.level
-    }
-    return await this.userModel.findByIdAndUpdate(id, update)
+	// 实名认证
+	async verify(verify: VerifyDTO, user: string) {
+		const signVerify: VerifyDTO = {
+			realName: this.cryptoUtil.aesEncrypt(verify.realName),
+			phone: this.cryptoUtil.aesEncrypt(verify.phone),
+			cardNumber: this.cryptoUtil.aesEncrypt(verify.cardNumber),
+			bank: verify.bank,
+			bandAddress: verify.bandAddress,
+			bankNumber: this.cryptoUtil.aesEncrypt(verify.bankNumber),
+		};
+		const phoneExist = await this.userModel.findOne({
+			phone: signVerify.phone,
+		});
+		if (phoneExist) {
+			throw new ApiException('手机号已注册', ApiErrorCode.EXIST, 406);
+		}
+		const cardNumberExist = await this.userModel.findOne({
+			cardNumber: signVerify.cardNumber,
+		});
+		if (cardNumberExist) {
+			throw new ApiException('身份证已注册', ApiErrorCode.EXIST, 406);
+		}
+		await this.userModel.findByIdAndUpdate(user, {
+			...signVerify,
+			isVerify: true,
+		});
+		return;
+	}
 
-  }
-
-  // 统计数量
-  async countByCondition(condition: any) {
-    return await this.userModel.countDocuments(condition)
-  }
+	// 充值vip
+	async changeVip(id: string) {
+		const user = await this.userModel.findById(id);
+		if (!user) {
+			throw new ApiException('用户不存在', ApiErrorCode.NO_EXIST, 404);
+		}
+		const vipExpire = user.vipExpire;
+		let newExpire = moment().add(1, 'year');
+		if (vipExpire) {
+			newExpire = moment(vipExpire).add(1, 'year');
+		}
+		await this.userModel.findByIdAndUpdate(user, {
+			vipExpire: newExpire,
+		});
+		return;
+	}
 }

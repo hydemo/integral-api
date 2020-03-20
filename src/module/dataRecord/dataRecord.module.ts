@@ -11,22 +11,17 @@ import { CategoryRecordModule } from '../categoryRecord/categoryRecord.module';
 import { GoodRecordModule } from '../goodRecord/goodRecord.module';
 
 @Module({
-  providers: [
-    DataRecordService,
-    ...dataRecordProviders,
-  ],
-  exports: [
-    DataRecordService,
-  ],
-  imports: [
-    DatabaseModule,
-    UserModule,
-    CategoryModule,
-    GoodModule,
-    OrderModule,
-    UserRecordModule,
-    CategoryRecordModule,
-    GoodRecordModule,
-  ],
+	providers: [DataRecordService, ...dataRecordProviders],
+	exports: [DataRecordService],
+	imports: [
+		DatabaseModule,
+		UserModule,
+		CategoryModule,
+		GoodModule,
+		OrderModule,
+		UserRecordModule,
+		CategoryRecordModule,
+		GoodRecordModule,
+	],
 })
-export class DataRecordModule { }
+export class DataRecordModule {}

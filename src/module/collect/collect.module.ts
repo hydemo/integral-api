@@ -5,16 +5,8 @@ import { CollectService } from './collect.service';
 import { ProductModule } from '../product/product.module';
 
 @Module({
-  providers: [
-    CollectService,
-    ...collectProviders,
-  ],
-  exports: [
-    CollectService,
-  ],
-  imports: [
-    DatabaseModule,
-    ProductModule,
-  ],
+	providers: [CollectService, ...collectProviders],
+	exports: [CollectService],
+	imports: [DatabaseModule, ProductModule],
 })
-export class CollectModule { }
+export class CollectModule {}

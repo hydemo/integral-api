@@ -11,22 +11,19 @@ import { ShipperModule } from '../shipper/shipper.module';
 import { OrderModule } from '../order/order.module';
 import { IntegrationModule } from '../integration/integration.module';
 import { UserCouponModule } from '../userCoupon/userCoupon.module';
+import { IntegrationSummaryModule } from '../integrationSummary/integrationSummary.module';
 
 @Module({
-  providers: [
-    RefundService,
-    ...refundsProviders,
-  ],
-  exports: [RefundService],
-  imports: [
-    DatabaseModule,
-    AddressModule,
-    OrderModule,
-    ShipperModule,
-    IntegrationModule,
-    UserCouponModule
-
-  ],
+	providers: [RefundService, ...refundsProviders],
+	exports: [RefundService],
+	imports: [
+		DatabaseModule,
+		AddressModule,
+		OrderModule,
+		ShipperModule,
+		IntegrationModule,
+		UserCouponModule,
+		IntegrationSummaryModule,
+	],
 })
-
-export class RefundModule { }
+export class RefundModule {}

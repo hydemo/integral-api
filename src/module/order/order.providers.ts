@@ -3,9 +3,10 @@ import { Connection } from 'mongoose';
 import { OrderSchema } from './order.schema';
 
 export const ordersProviders = [
-  {
-    provide: 'OrderModelToken',
-    useFactory: (connection: Connection) => connection.model('order', OrderSchema),
-    inject: ['MongoDBConnection'],
-  },
+	{
+		provide: 'OrderModelToken',
+		useFactory: (connection: Connection) =>
+			connection.model('order', OrderSchema),
+		inject: ['MongoDBConnection'],
+	},
 ];

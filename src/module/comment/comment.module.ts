@@ -5,14 +5,8 @@ import { commentsProviders } from './comment.provider';
 import { CommentService } from './comment.service';
 
 @Module({
-  providers: [
-    CommentService,
-    ...commentsProviders,
-  ],
-  exports: [CommentService],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [CommentService, ...commentsProviders],
+	exports: [CommentService],
+	imports: [DatabaseModule],
 })
-
-export class CommentModule { }
+export class CommentModule {}

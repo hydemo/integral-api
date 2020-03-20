@@ -3,9 +3,10 @@ import { Connection } from 'mongoose';
 import { ShipperSchema } from './shipper.schema';
 
 export const shippersProviders = [
-  {
-    provide: 'ShipperModelToken',
-    useFactory: (connection: Connection) => connection.model('shipper', ShipperSchema),
-    inject: ['MongoDBConnection'],
-  },
+	{
+		provide: 'ShipperModelToken',
+		useFactory: (connection: Connection) =>
+			connection.model('shipper', ShipperSchema),
+		inject: ['MongoDBConnection'],
+	},
 ];

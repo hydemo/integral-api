@@ -3,9 +3,10 @@ import { Connection } from 'mongoose';
 import { CategorySchema } from './category.schema';
 
 export const categorysProviders = [
-  {
-    provide: 'CategoryModelToken',
-    useFactory: (connection: Connection) => connection.model('category', CategorySchema),
-    inject: ['MongoDBConnection'],
-  },
+	{
+		provide: 'CategoryModelToken',
+		useFactory: (connection: Connection) =>
+			connection.model('category', CategorySchema),
+		inject: ['MongoDBConnection'],
+	},
 ];

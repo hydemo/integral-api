@@ -4,14 +4,8 @@ import { goodSpecificationsProviders } from './goodSpecification.providers';
 import { DatabaseModule } from '@database/database.module';
 
 @Module({
-  providers: [
-    GoodSpecificationService,
-    ...goodSpecificationsProviders,
-  ],
-  exports: [GoodSpecificationService],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [GoodSpecificationService, ...goodSpecificationsProviders],
+	exports: [GoodSpecificationService],
+	imports: [DatabaseModule],
 })
-
-export class GoodSpecificationModule { }
+export class GoodSpecificationModule {}

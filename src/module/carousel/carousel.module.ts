@@ -4,14 +4,8 @@ import { carouselsProviders } from './carousel.providers';
 import { DatabaseModule } from '@database/database.module';
 
 @Module({
-  providers: [
-    CarouselService,
-    ...carouselsProviders,
-  ],
-  exports: [CarouselService],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [CarouselService, ...carouselsProviders],
+	exports: [CarouselService],
+	imports: [DatabaseModule],
 })
-
-export class CarouselModule { }
+export class CarouselModule {}

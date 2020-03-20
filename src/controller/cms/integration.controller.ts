@@ -1,15 +1,10 @@
+import { UseGuards, Controller, Get, Query } from '@nestjs/common';
 import {
-  UseGuards,
-  Controller,
-  Get,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiUseTags,
-  ApiOkResponse,
-  ApiForbiddenResponse,
-  ApiOperation,
-  ApiBearerAuth,
+	ApiUseTags,
+	ApiOkResponse,
+	ApiForbiddenResponse,
+	ApiOperation,
+	ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guard/roles.guard';
@@ -22,19 +17,15 @@ import { IntegrationService } from 'src/module/integration/integration.service';
 @UseGuards(AuthGuard(), RolesGuard)
 @Controller('cms/integrations')
 export class CMSIntegrationController {
-  constructor(
-    private integrationService: IntegrationService,
-  ) { }
+	constructor(private integrationService: IntegrationService) {}
 
-  @Get('/')
-  @Roles(0)
-  @ApiOkResponse({
-    description: '积分记录列表',
-  })
-  @ApiOperation({ title: '积分记录列表', description: '积分记录列表' })
-  async list(
-    @Query() pagination: Pagination,
-  ): Promise<any> {
-    return await this.integrationService.list(pagination)
-  }
+	@Get('/')
+	@Roles(0)
+	@ApiOkResponse({
+		description: '积分记录列表',
+	})
+	@ApiOperation({ title: '积分记录列表', description: '积分记录列表' })
+	async list(@Query() pagination: Pagination): Promise<any> {
+		return await this.integrationService.list(pagination);
+	}
 }

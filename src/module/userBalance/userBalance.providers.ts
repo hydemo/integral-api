@@ -3,9 +3,10 @@ import { Connection } from 'mongoose';
 import { UserBalanceSchema } from './userBalance.schema';
 
 export const userBalancesProviders = [
-  {
-    provide: 'UserBalanceModelToken',
-    useFactory: (connection: Connection) => connection.model('userBalance', UserBalanceSchema),
-    inject: ['MongoDBConnection'],
-  },
+	{
+		provide: 'UserBalanceModelToken',
+		useFactory: (connection: Connection) =>
+			connection.model('userBalance', UserBalanceSchema),
+		inject: ['MongoDBConnection'],
+	},
 ];

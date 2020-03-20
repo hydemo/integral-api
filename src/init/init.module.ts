@@ -8,13 +8,8 @@ import { GoodRecordModule } from 'src/module/goodRecord/goodRecord.module';
 
 @Global()
 @Module({
-  providers: [
-    InitService,
-  ],
-  imports: [
-    AdminModule,
-    UserCouponModule,
-  ],
-  exports: [InitService],
+	providers: [InitService],
+	imports: [AdminModule, UserCouponModule],
+	exports: [InitService],
 })
-export class InitModule { }
+export class InitModule {}

@@ -7,21 +7,17 @@ import { AdminModule } from 'src/module/admin/admin.module';
 import { UserModule } from 'src/module/user/user.module';
 
 @Module({
-  providers: [
-    AuthService,
-    AuthStrategy,
-  ],
-  imports: [
-    UserModule,
-    AdminModule,
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secretOrPrivateKey: 'secretKey',
-      signOptions: {
-        expiresIn: 7 * 24 * 60 * 60,
-      },
-    }),
-  ],
+	providers: [AuthService, AuthStrategy],
+	imports: [
+		UserModule,
+		AdminModule,
+		PassportModule.register({ defaultStrategy: 'jwt' }),
+		JwtModule.register({
+			secretOrPrivateKey: 'secretKey',
+			signOptions: {
+				expiresIn: 7 * 24 * 60 * 60,
+			},
+		}),
+	],
 })
-
-export class AuthModule { }
+export class AuthModule {}

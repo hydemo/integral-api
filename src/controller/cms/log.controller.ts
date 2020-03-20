@@ -1,21 +1,21 @@
 import {
-  UseGuards,
-  Controller,
-  Request,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
+	UseGuards,
+	Controller,
+	Request,
+	Get,
+	Post,
+	Put,
+	Delete,
+	Body,
+	Param,
+	Query,
 } from '@nestjs/common';
 import {
-  ApiUseTags,
-  ApiOkResponse,
-  ApiForbiddenResponse,
-  ApiOperation,
-  ApiBearerAuth,
+	ApiUseTags,
+	ApiOkResponse,
+	ApiForbiddenResponse,
+	ApiOperation,
+	ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guard/roles.guard';
@@ -30,19 +30,15 @@ import { LogService } from 'src/module/logRecord/logRecord.service';
 @UseGuards(AuthGuard(), RolesGuard)
 @Controller('cms/logs')
 export class CMSLogController {
-  constructor(
-    private logService: LogService,
-  ) { }
+	constructor(private logService: LogService) {}
 
-  @Get('/')
-  @Roles(0)
-  @ApiOkResponse({
-    description: '日志列表',
-  })
-  @ApiOperation({ title: '日志列表', description: '日志列表' })
-  async list(
-    @Query() pagination: Pagination,
-  ): Promise<any> {
-    return await this.logService.list(pagination)
-  }
+	@Get('/')
+	@Roles(0)
+	@ApiOkResponse({
+		description: '日志列表',
+	})
+	@ApiOperation({ title: '日志列表', description: '日志列表' })
+	async list(@Query() pagination: Pagination): Promise<any> {
+		return await this.logService.list(pagination);
+	}
 }

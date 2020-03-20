@@ -4,14 +4,8 @@ import { productsProviders } from './product.providers';
 import { DatabaseModule } from '@database/database.module';
 
 @Module({
-  providers: [
-    ProductService,
-    ...productsProviders,
-  ],
-  exports: [ProductService],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [ProductService, ...productsProviders],
+	exports: [ProductService],
+	imports: [DatabaseModule],
 })
-
-export class ProductModule { }
+export class ProductModule {}

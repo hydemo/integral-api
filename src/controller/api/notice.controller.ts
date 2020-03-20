@@ -1,21 +1,21 @@
 import {
-  UseGuards,
-  Controller,
-  Request,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
+	UseGuards,
+	Controller,
+	Request,
+	Get,
+	Post,
+	Put,
+	Delete,
+	Body,
+	Param,
+	Query,
 } from '@nestjs/common';
 import {
-  ApiUseTags,
-  ApiOkResponse,
-  ApiForbiddenResponse,
-  ApiOperation,
-  ApiBearerAuth,
+	ApiUseTags,
+	ApiOkResponse,
+	ApiForbiddenResponse,
+	ApiOperation,
+	ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guard/roles.guard';
@@ -27,26 +27,22 @@ import { PhoneUtil } from 'src/utils/phone.util';
 @ApiForbiddenResponse({ description: 'Unauthorized' })
 @Controller('api/notices')
 export class ApiNoticeController {
-  constructor(
-    private noticeService: NoticeService,
-    private phoneUtil: PhoneUtil,
-  ) { }
+	constructor(
+		private noticeService: NoticeService,
+		private phoneUtil: PhoneUtil,
+	) {}
 
-  @Post('/oauth')
-  @ApiOperation({ title: '微信授权', description: '微信授权' })
-  async OAuth(
-    @Body() oauth: OAuthDTO,
-  ) {
-    await this.noticeService.oauth(oauth);
-    return 'success'
-  }
+	@Post('/oauth')
+	@ApiOperation({ title: '微信授权', description: '微信授权' })
+	async OAuth(@Body() oauth: OAuthDTO) {
+		await this.noticeService.oauth(oauth);
+		return 'success';
+	}
 
-  @Get('/code')
-  @ApiOperation({ title: '短信验证码', description: '短信验证码' })
-  async code(
-    @Query('phone') phone: string
-  ) {
-    await this.phoneUtil.sendVerificationCode(phone)
-    return 'success'
-  }
+	@Get('/code')
+	@ApiOperation({ title: '短信验证码', description: '短信验证码' })
+	async code(@Query('phone') phone: string) {
+		await this.phoneUtil.sendVerificationCode(phone);
+		return 'success';
+	}
 }

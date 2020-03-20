@@ -3,9 +3,10 @@ import { Connection } from 'mongoose';
 import { SpecificationSchema } from './specification.schema';
 
 export const specificationsProviders = [
-  {
-    provide: 'SpecificationModelToken',
-    useFactory: (connection: Connection) => connection.model('specification', SpecificationSchema),
-    inject: ['MongoDBConnection'],
-  },
+	{
+		provide: 'SpecificationModelToken',
+		useFactory: (connection: Connection) =>
+			connection.model('specification', SpecificationSchema),
+		inject: ['MongoDBConnection'],
+	},
 ];

@@ -13,38 +13,37 @@ import { UserCouponModule } from '../userCoupon/userCoupon.module';
 import { IntegrationModule } from '../integration/integration.module';
 import { UserBalanceModule } from '../userBalance/userBalance.module';
 import { ShipFeeModule } from '../shipFee/shipFee.module';
-import { VipModule } from '../vip/vip.module';
-import { MerchantModule } from '../merchant/merchant.module';
 import { GoodRecordModule } from '../goodRecord/goodRecord.module';
 import { UserRecordModule } from '../userRecord/userRecord.module';
 import { CategoryRecordModule } from '../categoryRecord/categoryRecord.module';
+import { IntegrationSummaryModule } from '../integrationSummary/integrationSummary.module';
+import { IntegrationRateModule } from '../integrationRate/integrationRate.module';
+import { UserModule } from '../user/user.module';
+import { ServiceFeeModule } from '../serviceFee/serviceFee.module';
 
 @Module({
-  providers: [
-    OrderService,
-    ...ordersProviders,
-  ],
-  exports: [OrderService],
-  imports: [
-    NoticeModule,
-    DatabaseModule,
-    ProductModule,
-    GoodModule,
-    CartModule,
-    AddressModule,
-    CommentModule,
-    GoodModule,
-    ShipperModule,
-    UserCouponModule,
-    IntegrationModule,
-    UserBalanceModule,
-    ShipFeeModule,
-    VipModule,
-    MerchantModule,
-    UserRecordModule,
-    GoodRecordModule
-
-  ],
+	providers: [OrderService, ...ordersProviders],
+	exports: [OrderService],
+	imports: [
+		NoticeModule,
+		DatabaseModule,
+		ProductModule,
+		GoodModule,
+		CartModule,
+		AddressModule,
+		CommentModule,
+		GoodModule,
+		ShipperModule,
+		UserCouponModule,
+		IntegrationModule,
+		UserBalanceModule,
+		ShipFeeModule,
+		UserRecordModule,
+		GoodRecordModule,
+		IntegrationSummaryModule,
+		IntegrationRateModule,
+		UserModule,
+		ServiceFeeModule,
+	],
 })
-
-export class OrderModule { }
+export class OrderModule {}

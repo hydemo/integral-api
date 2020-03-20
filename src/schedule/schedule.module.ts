@@ -6,18 +6,15 @@ import { UserRecordModule } from 'src/module/userRecord/userRecord.module';
 import { CategoryRecordModule } from 'src/module/categoryRecord/categoryRecord.module';
 import { GoodRecordModule } from 'src/module/goodRecord/goodRecord.module';
 @Global()
-
 @Module({
-  providers: [
-    ScheduleService,
-  ],
-  imports: [
-    OrderModule,
-    DataRecordModule,
-    UserRecordModule,
-    CategoryRecordModule,
-    GoodRecordModule,
-  ],
-  exports: [ScheduleService],
+	providers: [ScheduleService],
+	imports: [
+		OrderModule,
+		DataRecordModule,
+		UserRecordModule,
+		CategoryRecordModule,
+		GoodRecordModule,
+	],
+	exports: [ScheduleService],
 })
-export class ScheduleModule { }
+export class ScheduleModule {}

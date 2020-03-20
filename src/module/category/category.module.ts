@@ -4,14 +4,8 @@ import { categorysProviders } from './category.providers';
 import { DatabaseModule } from '@database/database.module';
 
 @Module({
-  providers: [
-    CategoryService,
-    ...categorysProviders,
-  ],
-  exports: [CategoryService],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [CategoryService, ...categorysProviders],
+	exports: [CategoryService],
+	imports: [DatabaseModule],
 })
-
-export class CategoryModule { }
+export class CategoryModule {}

@@ -10,21 +10,18 @@ import { CmsControllerTemplateService } from './apiTemplete/cmsController.templa
 import { AppModuleTemplateService } from './apiTemplete/appModule.template';
 
 @Module({
-  providers: [
-    CodeService,
-    DtoTemplateService,
-    InterFaceTemplateService,
-    ModuleTemplateService,
-    ProviderTemplateService,
-    SchemaTemplateService,
-    ServiceTemplateService,
-    CmsControllerTemplateService,
-    AppModuleTemplateService,
-  ],
-  exports: [CodeService],
-  imports: [
-
-  ],
+	providers: [
+		CodeService,
+		DtoTemplateService,
+		InterFaceTemplateService,
+		ModuleTemplateService,
+		ProviderTemplateService,
+		SchemaTemplateService,
+		ServiceTemplateService,
+		CmsControllerTemplateService,
+		AppModuleTemplateService,
+	],
+	exports: [CodeService],
+	imports: [],
 })
-
-export class CodeModule { }
+export class CodeModule {}

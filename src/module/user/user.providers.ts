@@ -3,9 +3,10 @@ import { Connection } from 'mongoose';
 import { UserSchema } from './user.schema';
 
 export const usersProviders = [
-  {
-    provide: 'UserModelToken',
-    useFactory: (connection: Connection) => connection.model('user', UserSchema),
-    inject: ['MongoDBConnection'],
-  },
+	{
+		provide: 'UserModelToken',
+		useFactory: (connection: Connection) =>
+			connection.model('user', UserSchema),
+		inject: ['MongoDBConnection'],
+	},
 ];

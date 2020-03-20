@@ -6,17 +6,8 @@ import { UserCouponModule } from '../userCoupon/userCoupon.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  providers: [
-    CouponService,
-    ...couponProviders,
-  ],
-  exports: [
-    CouponService,
-  ],
-  imports: [
-    DatabaseModule,
-    UserModule,
-    UserCouponModule,
-  ],
+	providers: [CouponService, ...couponProviders],
+	exports: [CouponService],
+	imports: [DatabaseModule, UserModule, UserCouponModule],
 })
-export class CouponModule { }
+export class CouponModule {}

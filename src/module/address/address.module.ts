@@ -6,16 +6,8 @@ import { ProductModule } from '../product/product.module';
 import { GoodModule } from '../good/good.module';
 
 @Module({
-  providers: [
-    AddressService,
-    ...addresssProviders,
-  ],
-  exports: [AddressService],
-  imports: [
-    DatabaseModule,
-    ProductModule,
-    GoodModule,
-  ],
+	providers: [AddressService, ...addresssProviders],
+	exports: [AddressService],
+	imports: [DatabaseModule, ProductModule, GoodModule],
 })
-
-export class AddressModule { }
+export class AddressModule {}

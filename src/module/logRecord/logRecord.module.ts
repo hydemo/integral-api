@@ -4,15 +4,8 @@ import { logProviders } from './logRecord.providers';
 import { LogService } from './logRecord.service';
 
 @Module({
-  providers: [
-    LogService,
-    ...logProviders,
-  ],
-  exports: [
-    LogService,
-  ],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [LogService, ...logProviders],
+	exports: [LogService],
+	imports: [DatabaseModule],
 })
-export class LogModule { }
+export class LogModule {}

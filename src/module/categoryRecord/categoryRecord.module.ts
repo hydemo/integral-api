@@ -4,15 +4,8 @@ import { categoryRecordProviders } from './categoryRecord.providers';
 import { CategoryRecordService } from './categoryRecord.service';
 
 @Module({
-  providers: [
-    CategoryRecordService,
-    ...categoryRecordProviders,
-  ],
-  exports: [
-    CategoryRecordService,
-  ],
-  imports: [
-    DatabaseModule,
-  ],
+	providers: [CategoryRecordService, ...categoryRecordProviders],
+	exports: [CategoryRecordService],
+	imports: [DatabaseModule],
 })
-export class CategoryRecordModule { }
+export class CategoryRecordModule {}

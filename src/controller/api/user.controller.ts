@@ -1,146 +1,149 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards, Inject, Request, Put, Response, Delete } from '@nestjs/common';
 import {
-  ApiUseTags,
-  ApiOkResponse,
-  ApiForbiddenResponse,
-  ApiOperation,
+	Body,
+	Controller,
+	Get,
+	Post,
+	UseGuards,
+	Inject,
+	Request,
+	Query,
+} from '@nestjs/common';
+import {
+	ApiUseTags,
+	ApiOkResponse,
+	ApiForbiddenResponse,
+	ApiOperation,
 } from '@nestjs/swagger';
-import * as moment from 'moment'
 import { AuthGuard } from '@nestjs/passport';
-import { RechargeService } from 'src/module/recharge/recharge.service';
-import { RechargeDTO } from 'src/module/user/users.dto';
-import { UserCouponService } from 'src/module/userCoupon/userCoupon.service';
-import { Pagination } from 'src/common/dto/pagination.dto';
-import { ApiErrorCode } from 'src/common/enum/api-error-code.enum';
-import { ApiException } from 'src/common/expection/api.exception';
-import { IntegrationService } from 'src/module/integration/integration.service';
-import { CreateIntegrationDTO } from 'src/module/integration/integration.dto';
+import { VipCardService } from 'src/module/vipCard/vipCard.service';
+import {
+	VipCardDTO,
+	VerifyDTO,
+	GiveIntegrationDTO,
+} from 'src/module/user/users.dto';
 import { UserService } from 'src/module/user/user.service';
-import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
-import { UserMerchantDTO } from 'src/module/user/login.dto';
-import { MerchantService } from 'src/module/merchant/merchant.service';
-
+import { CryptoUtil } from 'src/utils/crypto.util';
+import { IntegrationService } from 'src/module/integration/integration.service';
+import { Pagination } from 'src/common/dto/pagination.dto';
+import { GoodService } from 'src/module/good/good.service';
 
 @ApiUseTags('user')
 @ApiForbiddenResponse({ description: 'Unauthorized' })
 @UseGuards(AuthGuard())
 @Controller('users')
 export class ApiUserController {
-  constructor(
-    @Inject(RechargeService) private rechargeService: RechargeService,
-    @Inject(UserCouponService) private userCouponService: UserCouponService,
-    @Inject(IntegrationService) private integrationService: IntegrationService,
-    @Inject(UserService) private userService: UserService,
-    @Inject(MerchantService) private merchantService: MerchantService,
-  ) { }
+	constructor(
+		@Inject(VipCardService) private vipCardService: VipCardService,
+		@Inject(UserService) private userService: UserService,
+		@Inject(IntegrationService) private integrationService: IntegrationService,
+		@Inject(CryptoUtil) private cryptoUtil: CryptoUtil,
+		@Inject(GoodService) private goodService: GoodService,
+	) {}
 
-  @Get('/balance')
-  @ApiOkResponse({
-    description: '余额',
-  })
-  @ApiOperation({ title: '余额', description: '余额' })
-  async list(
-    @Request() req: any,
-  ): Promise<any> {
-    return req.user.balance
-  }
-  @Get('/integration')
-  @ApiOkResponse({
-    description: '用户积分',
-  })
-  @ApiOperation({ title: '用户积分', description: '用户积分' })
-  async integration(
-    @Request() req: any,
-  ): Promise<any> {
-    return { integration: req.user.integration, integrationTotal: req.user.integrationTotal, vip: req.user.vip }
-  }
+	@Get('/balance')
+	@ApiOkResponse({
+		description: '余额',
+	})
+	@ApiOperation({ title: '余额', description: '余额' })
+	async list(@Request() req: any): Promise<any> {
+		return req.user.balance;
+	}
 
-  @Post('/recharge')
-  @ApiOkResponse({
-    description: '充值',
-  })
-  @ApiOperation({ title: '充值', description: '充值' })
-  async recharge(
-    @Body() recharge: RechargeDTO,
-    @Request() req: any,
-  ): Promise<any> {
-    return await this.rechargeService.recharge(recharge, req.user._id)
-  }
+	@Get('/address')
+	@ApiOkResponse({
+		description: '获取积分地址',
+	})
+	@ApiOperation({ title: '获取积分地址', description: '获取积分地址' })
+	async integrationAddress(@Request() req: any): Promise<any> {
+		return req.user.integrationAddress;
+	}
 
-  @Get('/sign')
-  @ApiOkResponse({
-    description: '判断用户是否签到',
-  })
-  @ApiOperation({ title: '判断用户是否签到', description: '判断用户是否签到 true:已签到 false:未签到' })
-  async signCheck(
-    @Request() req: any,
-  ): Promise<any> {
-    const today = moment().startOf('D')
-    if (req.user.signTime && moment(req.user.signTime) > moment(today)) {
-      return true
-    }
-    return false
-  }
+	@Get('/integration')
+	@ApiOkResponse({
+		description: '用户积分',
+	})
+	@ApiOperation({ title: '用户积分', description: '用户积分' })
+	async integration(@Request() req: any): Promise<any> {
+		return { integration: req.user.integration };
+	}
 
-  @Post('/sign')
-  @ApiOkResponse({
-    description: '签到',
-  })
-  @ApiOperation({ title: '签到', description: '签到' })
-  async sign(
-    @Request() req: any,
-  ): Promise<any> {
-    const today = moment().startOf('D')
-    if (req.user.signTime && moment(req.user.signTime) > moment(today)) {
-      throw new ApiException('已签到', ApiErrorCode.NO_PERMISSION, 403)
-    }
-    const newIntegration: CreateIntegrationDTO = {
-      user: req.user._id,
-      count: 10,
-      type: 'add',
-      sourceType: 3,
-      sourceId: req.user._id
-    }
-    await this.integrationService.create(newIntegration)
-    await this.userService.updateById(req.user._id, { signTime: Date.now() })
-  }
+	@Post('/integration')
+	@ApiOkResponse({
+		description: '赠送积分',
+	})
+	@ApiOperation({ title: '赠送积分', description: '赠送积分' })
+	async giveIntegration(
+		@Body() integration: GiveIntegrationDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.integrationService.giveIntegration(
+			req.user._id,
+			integration.address,
+			integration.count,
+		);
+	}
 
-  @Get('/coupons')
-  @ApiOkResponse({
-    description: '红包优惠券数量',
-  })
-  @ApiOperation({ title: '红包优惠券数量', description: '红包优惠券数量' })
-  async coupons(
-    @Query() pagination: Pagination,
-    @Query('type') type: number,
-    @Query('tab') tab: number,
-    @Request() req: any
-  ): Promise<any> {
-    return await this.userCouponService.list(pagination, Number(type), Number(tab), req.user._id)
-  }
+	@Post('/vipCard')
+	@ApiOkResponse({
+		description: '充值升级vip',
+	})
+	@ApiOperation({ title: '充值升级vip', description: '充值升级vip' })
+	async vipCard(
+		@Body() vipCard: VipCardDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.vipCardService.useVipCard(vipCard, req.user._id);
+	}
 
-  @Get('/coupons/count')
-  @ApiOkResponse({
-    description: '红包优惠券数量',
-  })
-  @ApiOperation({ title: '红包优惠券数量', description: '红包优惠券数量' })
-  async couponCount(
-    @Request() req: any,
-  ): Promise<any> {
-    return await this.userCouponService.count(req.user._id)
-  }
+	@Post('/verify')
+	@ApiOkResponse({
+		description: '实名认证',
+	})
+	@ApiOperation({ title: '实名认证', description: '实名认证' })
+	async verify(@Body() verify: VerifyDTO, @Request() req: any): Promise<any> {
+		return await this.userService.verify(verify, req.user._id);
+	}
 
-  @Put('/:id/merchant')
-  @ApiOkResponse({
-    description: '设置默认提货点',
-  })
-  @ApiOperation({ title: '设置默认提货点', description: '设置默认提货点' })
-  async merchant(
-    @Param('id', new MongodIdPipe()) id: string,
-    @Body() merchant: UserMerchantDTO,
-  ): Promise<any> {
-    await this.userService.updateById(id, merchant)
-    return await this.merchantService.findById(merchant.merchant)
-  }
+	@Get('/verify')
+	@ApiOkResponse({
+		description: '获取实名认证详情',
+	})
+	@ApiOperation({ title: '获取实名认证详情', description: '获取实名认证详情' })
+	async verifyInfo(@Request() req: any): Promise<any> {
+		const signVerify: VerifyDTO = {
+			realName: this.cryptoUtil.signName(req.user.realName),
+			phone: this.cryptoUtil.aesEncrypt(req.user.phone),
+			cardNumber: this.cryptoUtil.aesEncrypt(req.user.cardNumber),
+			bank: req.user.bank,
+			bandAddress: req.user.bandAddress,
+			bankNumber: this.cryptoUtil.aesEncrypt(req.user.bankNumber),
+		};
+		return signVerify;
+	}
 
+	@Get('/invite')
+	@ApiOkResponse({
+		description: '邀请用户列表',
+	})
+	@ApiOperation({ title: '邀请用户列表', description: '邀请用户列表' })
+	async invite(
+		@Query() pagination: Pagination,
+		@Request() req: any,
+	): Promise<any> {
+		return this.userService.list(pagination, req.user._id);
+	}
+
+	@Get('/goods')
+	@ApiOkResponse({
+		description: '上架推广商品',
+	})
+	@ApiOperation({ title: '上架推广商品', description: '上架推广商品' })
+	async goods(
+		@Query() pagination: Pagination,
+		@Request() req: any,
+	): Promise<any> {
+		return this.goodService.listByUser(pagination, {
+			recommendUser: req.user._id,
+		});
+	}
 }
