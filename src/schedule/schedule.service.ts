@@ -34,14 +34,14 @@ export class ScheduleService {
 		completeOrderRule.hour = 0;
 
 		const priceRule = new Schedule.RecurrenceRule();
-		completeOrderRule.second = 0;
-		completeOrderRule.minute = 0;
-		completeOrderRule.hour = 20;
+		priceRule.second = 0;
+		priceRule.minute = 0;
+		priceRule.hour = 20;
 
 		const integrationRule = new Schedule.RecurrenceRule();
-		completeOrderRule.second = 0;
-		completeOrderRule.minute = 0;
-		completeOrderRule.hour = 0;
+		integrationRule.second = 0;
+		integrationRule.minute = 0;
+		integrationRule.hour = 0;
 
 		Schedule.scheduleJob(logRule, async () => {
 			await this.dataRecordService.genLog();
