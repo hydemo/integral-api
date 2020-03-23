@@ -681,8 +681,10 @@ export class OrderService {
 		if (!rate && !ambassadorLevel && !isVip) {
 			return 0;
 		}
+
 		const integration: CreateIntegrationDTO = {
-			count: Number((amount / integrationPrice).toFixed(3)),
+			count:
+				sourceType !== 5 ? Number((amount / integrationPrice).toFixed(3)) : 0,
 			type: 'add',
 			sourceType,
 			sourceId,

@@ -42,7 +42,7 @@ export class IntegrationService {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
 		}
 		const count = Number(integration.count.toFixed(3));
-		if (!count || count <= 0) {
+		if (!integration.amount && !count) {
 			return null;
 		}
 		if (integration.type === 'add') {
