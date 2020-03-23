@@ -1,7 +1,6 @@
 import { Model } from 'mongoose';
 import * as moment from 'moment';
 import { Inject, Injectable } from '@nestjs/common';
-import { PaginationUtil } from 'src/utils/pagination.util';
 import { CreateIntegrationSummaryDTO } from './integrationSummary.dto';
 import { IIntegrationSummary } from './integrationSummary.interfaces';
 import { ApiException } from 'src/common/expection/api.exception';
@@ -12,7 +11,6 @@ export class IntegrationSummaryService {
 	constructor(
 		@Inject('IntegrationSummaryModelToken')
 		private readonly integrationSummaryModel: Model<IIntegrationSummary>,
-		@Inject(PaginationUtil) private readonly paginationUtil: PaginationUtil,
 	) {}
 	async init() {
 		const data = await this.integrationSummaryModel.findOne();
@@ -85,11 +83,23 @@ export class IntegrationSummaryService {
 		return data;
 	}
 
+	// 更新积分价格
+	async refreshPrice() {
+		const data = await this.integrationSummaryModel
+			.findOne({ date: moment().format('YYYY-MM-DD') })
+			.lean();
+		if (!data) {
+			throw new ApiException('无当前积分价格', ApiErrorCode.NO_EXIST, 404);
+		}
+		await this.integrationSummaryModel.findByIdAndUpdate(data._id, {
+			integrationPrice: data.integration
+				? Number((data.amount / data.integration).toFixed(2))
+				: 0.01,
+		});
+	}
+
 	// 修改承兑池和积分池
-	async updatePool(
-		amount: number,
-		integration: number,
-	): Promise<IIntegrationSummary | null> {
+	async updatePool(): Promise<IIntegrationSummary | null> {
 		const summaryOfToday: IIntegrationSummary | null = await this.integrationSummaryModel
 			.findOne({
 				date: moment()
@@ -100,9 +110,11 @@ export class IntegrationSummaryService {
 		if (!summaryOfToday) {
 			throw new ApiException('系统错误', ApiErrorCode.INTERNAL_ERROR, 500);
 		}
-		const newAmount = Number((summaryOfToday.amountToday + amount).toFixed(2));
+		const newAmount = Number(
+			(summaryOfToday.amountToday + summaryOfToday.amount).toFixed(2),
+		);
 		const newIntegration = Number(
-			(summaryOfToday.integrationToday + integration).toFixed(2),
+			(summaryOfToday.integrationToday + summaryOfToday.integration).toFixed(2),
 		);
 		const newSummary: CreateIntegrationSummaryDTO = {
 			date: moment().format('YYYY-MM-DD'),
@@ -113,5 +125,26 @@ export class IntegrationSummaryService {
 			integrationPrice: summaryOfToday.integrationPrice,
 		};
 		return await this.integrationSummaryModel.create(newSummary);
+	}
+
+	// 修改承兑池和积分池
+	async updateIntegration(
+		amount: number,
+		integration: number,
+	): Promise<IIntegrationSummary | null> {
+		const summaryOfToday: IIntegrationSummary | null = await this.integrationSummaryModel
+			.findOne({ date: moment().format('YYYY-MM-DD') })
+			.lean();
+		if (!summaryOfToday) {
+			throw new ApiException('系统错误', ApiErrorCode.INTERNAL_ERROR, 500);
+		}
+		const newAmount = Number((summaryOfToday.amountToday + amount).toFixed(2));
+		const newIntegration = Number(
+			(summaryOfToday.integrationToday + integration).toFixed(2),
+		);
+		return await this.integrationSummaryModel.findByIdAndUpdate(
+			summaryOfToday._id,
+			{ amountToday: newAmount, integrationToday: newIntegration },
+		);
 	}
 }

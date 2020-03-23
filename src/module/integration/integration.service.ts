@@ -49,7 +49,7 @@ export class IntegrationService {
 			if (integration.user) {
 				await this.userService.incIntegration(integration.user, count);
 			}
-			await this.integrationSummaryService.updatePool(
+			await this.integrationSummaryService.updateIntegration(
 				integration.amount,
 				integration.count,
 			);
@@ -57,7 +57,7 @@ export class IntegrationService {
 			if (integration.user) {
 				await this.userService.incIntegration(integration.user, -count);
 			}
-			await this.integrationSummaryService.updatePool(
+			await this.integrationSummaryService.updateIntegration(
 				-integration.amount,
 				-integration.count,
 			);
@@ -71,6 +71,7 @@ export class IntegrationService {
 		const list = await this.integrationModel
 			.find(condition)
 			.limit(pagination.pageSize)
+			.populate({ path: 'user', model: 'user', select: '_id nickname' })
 			.skip((pagination.current - 1) * pagination.pageSize)
 			.sort({ createdAt: -1 })
 			.lean()
@@ -80,29 +81,28 @@ export class IntegrationService {
 	}
 
 	// 分页查询数据
+	async fetchByBond(sourceId: string): Promise<IIntegration[]> {
+		return await this.integrationModel
+			.find({ sourceId })
+			.populate({ path: 'user', model: 'user', select: '_id nickname ' })
+			.sort({ createdAt: -1 })
+			.lean()
+			.exec();
+	}
+
+	// 分页查询数据
 	async listByUser(
 		pagination: Pagination,
 		sourceType: number,
 		user: string,
 	): Promise<IList<IIntegration>> {
-		let populate = {};
 		const condition = this.paginationUtil.genCondition(pagination, []);
 		if (sourceType === 2) {
 			condition.user = user;
 			condition.sourceType = sourceType;
-			populate = {
-				path: 'sourceUser',
-				model: 'user',
-				select: '_id nickname',
-			};
 		} else if (sourceType === 3 || sourceType === 4) {
 			condition.user = user;
 			condition.sourceType = sourceType;
-			populate = {
-				path: 'good',
-				model: 'good',
-				select: '_id name',
-			};
 		} else {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
 		}
@@ -111,7 +111,11 @@ export class IntegrationService {
 			.limit(pagination.pageSize)
 			.skip((pagination.current - 1) * pagination.pageSize)
 			.sort({ createdAt: -1 })
-			.populate(populate)
+			.populate({
+				path: 'sourceUser',
+				model: 'user',
+				select: '_id nickname',
+			})
 			.lean()
 			.exec();
 		const total = await this.integrationModel.countDocuments(condition);
@@ -149,7 +153,7 @@ export class IntegrationService {
 			};
 			const newServiceFee = await this.serviceFeeService.create(serviceFeeDTO);
 			sourceId = newServiceFee._id;
-			await this.integrationSummaryService.updatePool(
+			await this.integrationSummaryService.updateIntegration(
 				-serviceAmount,
 				-serviceCount,
 			);
@@ -220,7 +224,7 @@ export class IntegrationService {
 		return;
 	}
 
-	// 创建数据
+	// 修改积分
 	async updateAmount(amount: number) {
 		if (amount < 0) {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);

@@ -5,6 +5,7 @@ import { DataRecordModule } from 'src/module/dataRecord/dataRecord.module';
 import { UserRecordModule } from 'src/module/userRecord/userRecord.module';
 import { CategoryRecordModule } from 'src/module/categoryRecord/categoryRecord.module';
 import { GoodRecordModule } from 'src/module/goodRecord/goodRecord.module';
+import { IntegrationSummaryModule } from 'src/module/integrationSummary/integrationSummary.module';
 @Global()
 @Module({
 	providers: [ScheduleService],
@@ -14,6 +15,7 @@ import { GoodRecordModule } from 'src/module/goodRecord/goodRecord.module';
 		UserRecordModule,
 		CategoryRecordModule,
 		GoodRecordModule,
+		IntegrationSummaryModule,
 	],
 	exports: [ScheduleService],
 })

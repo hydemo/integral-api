@@ -80,4 +80,14 @@ export class CMSAmbassadorRateController {
 	): Promise<any> {
 		return await this.ambassadorRateService.update(id, ambassadorRate);
 	}
+
+	@Delete('/:id')
+	@Roles(1)
+	@ApiOkResponse({
+		description: '删除大使分发比例',
+	})
+	@ApiOperation({ title: '删除大使分发比例', description: '删除大使分发比例' })
+	async remove(@Param('id', new MongodIdPipe()) id: string): Promise<any> {
+		return await this.ambassadorRateService.remove(id);
+	}
 }

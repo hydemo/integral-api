@@ -1,11 +1,12 @@
 import { Injectable, Global } from '@nestjs/common';
 import * as moment from 'moment';
 import { Pagination } from 'src/common/dto/pagination.dto';
+import { CryptoUtil } from './crypto.util';
 
 @Injectable()
 @Global()
 export class PaginationUtil {
-	constructor() {}
+	constructor(private readonly cryptoUtil: CryptoUtil) {}
 
 	/**
 	 * 生成加密数据
@@ -23,8 +24,16 @@ export class PaginationUtil {
 			const reg = new RegExp(value, 'i');
 			keywords.map(key => {
 				const regCondition: any = {};
-				regCondition[key] = reg;
-				search.push(regCondition);
+				if (key === 'phone') {
+					regCondition[key] = new RegExp(
+						this.cryptoUtil.aesEncrypt(value),
+						'i',
+					);
+					search.push(regCondition);
+				} else {
+					regCondition[key] = reg;
+					search.push(regCondition);
+				}
 			});
 		}
 		if (filter) {

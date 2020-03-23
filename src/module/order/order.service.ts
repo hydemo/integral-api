@@ -297,9 +297,9 @@ export class OrderService {
 		if (!newOrder) {
 			return;
 		}
-		console.log(newOrder, 'order');
 		// return await this.payOrder(newOrder, user._id);
 		await this.paySuccess(newOrder, '', 1);
+		await this.testComplete(newOrder._id);
 	}
 
 	// 微信支付订单
@@ -643,8 +643,11 @@ export class OrderService {
 			moment().format('YYYY-MM-DD'),
 		);
 
-		const integrationUser = await this.userService.findById(user);
-		if (!integrationUser) {
+		let integrationUser: any = null;
+		if (user) {
+			integrationUser = await this.userService.findById(user);
+		}
+		if (!integrationUser && user) {
 			throw new ApiException('用户不存在', ApiErrorCode.NO_EXIST, 404);
 		}
 		if (!integrationPrice && integrationPrice < 0) {
@@ -656,31 +659,34 @@ export class OrderService {
 
 		let isVip = false;
 		let ambassadorLevel = 0;
-		const amount = Number(((serviceFee * rate) / 100).toFixed(2));
-		let userAmount = amount;
+		let amount = Number(((serviceFee * rate) / 100).toFixed(2));
 
-		if (integrationUser.ambassadorLevel) {
+		if (
+			integrationUser &&
+			integrationUser.ambassadorLevel &&
+			sourceType === 3
+		) {
 			ambassadorLevel = integrationUser.ambassadorLevel;
 			isVip = false;
 			const ambassadorRates = await this.ambassadorRateService.getRate(
 				ambassadorLevel,
 			);
 			const ambassadorRate = ambassadorRates[sourceType];
-			userAmount = Number(((serviceFee * ambassadorRate) / 100).toFixed(2));
+			amount = Number(((serviceFee * ambassadorRate) / 100).toFixed(2));
 		}
 		if (vipRate) {
 			isVip = true;
-			userAmount = Number(((serviceFee * vipRate) / 100).toFixed(2));
+			amount = Number(((serviceFee * vipRate) / 100).toFixed(2));
 		}
 		if (!rate && !ambassadorLevel && !isVip) {
 			return 0;
 		}
 		const integration: CreateIntegrationDTO = {
-			count: Number((userAmount / integrationPrice).toFixed(3)),
+			count: Number((amount / integrationPrice).toFixed(3)),
 			type: 'add',
 			sourceType,
 			sourceId,
-			amount: userAmount,
+			amount,
 			isVip,
 			ambassadorLevel,
 		};
@@ -703,13 +709,17 @@ export class OrderService {
 		let serviceFeeMinus = 0;
 		await Promise.all(
 			order.products.map(async product => {
+				if (!product.product.serviceFee) {
+					return;
+				}
 				const serviceFee =
 					(product.count - product.refundCount) * product.product.serviceFee;
+
 				serviceFeeTotal += serviceFee;
 				// 商品推广人积分发放
 				if (product.recommendUser) {
 					serviceFeeMinus += await this.createIntegration(
-						serviceFeeTotal,
+						serviceFee,
 						order._id,
 						3,
 						product.recommendUser,
@@ -720,7 +730,7 @@ export class OrderService {
 				// 上架推广人积分发放
 				if (product.good.recommendUser) {
 					serviceFeeMinus += await this.createIntegration(
-						serviceFeeTotal,
+						serviceFee,
 						order._id,
 						4,
 						product.good.recommendUser,
@@ -761,6 +771,18 @@ export class OrderService {
 		await this.serviceFeeService.create(serviceFeeDTO);
 	}
 
+	async testComplete(id) {
+		const completeOrder = await this.orderModel
+			.findById(id)
+			.populate({ path: 'products.product', model: 'product' })
+			.populate({ path: 'products.good', model: 'good' })
+			.populate({ path: 'user', model: 'user' });
+		if (!completeOrder) {
+			return;
+		}
+		await this.assignIntegration(completeOrder);
+	}
+
 	async completeOrder() {
 		await this.orderModel.updateMany(
 			{
@@ -776,9 +798,9 @@ export class OrderService {
 				checkResult: 4,
 				isDelete: false,
 			})
-			.populate({ path: 'products.product', moder: 'product' })
-			.populate({ path: 'products.good', moder: 'good' })
-			.populate({ path: 'user', moder: 'user' });
+			.populate({ path: 'products.product', model: 'product' })
+			.populate({ path: 'products.good', model: 'good' })
+			.populate({ path: 'user', model: 'user' });
 		await Promise.all(
 			completeOrders.map(async completeOrder => {
 				await this.assignIntegration(completeOrder);

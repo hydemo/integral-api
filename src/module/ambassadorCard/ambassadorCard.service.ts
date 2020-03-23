@@ -39,7 +39,10 @@ export class AmbassadorCardService {
 
 	// 列表
 	async list(pagination: Pagination): Promise<IList<IAmbassadorCard>> {
-		const condition = this.paginationUtil.genCondition(pagination, ['key']);
+		const condition = this.paginationUtil.genCondition(pagination, [
+			'key',
+			'level',
+		]);
 		const list = await this.ambassadorCardModel
 			.find(condition)
 			.limit(pagination.pageSize)
@@ -52,10 +55,11 @@ export class AmbassadorCardService {
 		return { list, total };
 	}
 	// 删除数据
-	async findByIdAndRemove(id: string): Promise<boolean> {
+	async findByIdAndRemove(id: string, user: string): Promise<boolean> {
 		await this.ambassadorCardModel.findByIdAndUpdate(id, {
 			isDelete: true,
 			deleteTime: Date.now(),
+			deleteBy: user,
 		});
 		return true;
 	}
@@ -68,7 +72,7 @@ export class AmbassadorCardService {
 	async recoverById(id: string) {
 		await this.ambassadorCardModel.findByIdAndUpdate(id, {
 			isDelete: false,
-			$unset: { deleteTime: 1 },
+			$unset: { deleteTime: 1, deleteBy: 1 },
 		});
 		return;
 	}
@@ -92,6 +96,6 @@ export class AmbassadorCardService {
 			useBy: user,
 			useTime: Date.now(),
 		});
-		return 'success';
+		return { level: card.level };
 	}
 }

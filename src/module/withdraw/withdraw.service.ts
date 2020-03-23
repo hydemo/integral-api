@@ -22,6 +22,9 @@ export class WithdrawService {
 
 	// 创建数据
 	async create(amount: number, user: IUser): Promise<string> {
+		if (!user.isVerify) {
+			throw new ApiException('请先实名认证', ApiErrorCode.INPUT_ERROR, 406);
+		}
 		if (user.balance < 100 || amount > user.balance) {
 			throw new ApiException('余额不足', ApiErrorCode.INPUT_ERROR, 406);
 		}
@@ -86,7 +89,7 @@ export class WithdrawService {
 		if (withdraw.checkResult !== 1) {
 			throw new ApiException('提现申请已处理', ApiErrorCode.NO_EXIST, 404);
 		}
-		await this.withdrawModel.findById(id, {
+		await this.withdrawModel.findByIdAndUpdate(id, {
 			checkResult: 2,
 			reviewer,
 			reviewTime: Date.now(),
@@ -110,8 +113,8 @@ export class WithdrawService {
 			sourceType: 3,
 		};
 		await this.userBalanceService.create(balance);
-		await this.withdrawModel.findById(id, {
-			checkResult: 2,
+		await this.withdrawModel.findByIdAndUpdate(id, {
+			checkResult: 3,
 			reviewer,
 			reviewTime: Date.now(),
 		});

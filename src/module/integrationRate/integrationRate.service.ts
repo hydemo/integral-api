@@ -87,7 +87,7 @@ export class IntegrationRateService {
 	async getRate() {
 		const result: any = {};
 		const list: IIntegrationRate[] = await this.integrationRateModel
-			.find({ isDelete: false })
+			.find({})
 			.lean();
 		list.map(li => {
 			result[li.type] = li.rate;

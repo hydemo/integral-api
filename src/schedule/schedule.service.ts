@@ -5,6 +5,7 @@ import { DataRecordService } from 'src/module/dataRecord/dataRecord.service';
 import { GoodRecordService } from 'src/module/goodRecord/goodRecord.service';
 import { CategoryRecordService } from 'src/module/categoryRecord/categoryRecord.service';
 import { UserRecordService } from 'src/module/userRecord/userRecord.service';
+import { IntegrationSummaryService } from 'src/module/integrationSummary/integrationSummary.service';
 
 @Injectable()
 export class ScheduleService {
@@ -17,6 +18,8 @@ export class ScheduleService {
 		private readonly goodRecordService: GoodRecordService,
 		@Inject(CategoryRecordService)
 		private readonly categoryRecordService: CategoryRecordService,
+		@Inject(IntegrationSummaryService)
+		private readonly integrationSummaryService: IntegrationSummaryService,
 	) {}
 
 	async enableSchedule() {
@@ -30,6 +33,16 @@ export class ScheduleService {
 		completeOrderRule.minute = 0;
 		completeOrderRule.hour = 0;
 
+		const priceRule = new Schedule.RecurrenceRule();
+		completeOrderRule.second = 0;
+		completeOrderRule.minute = 0;
+		completeOrderRule.hour = 20;
+
+		const integrationRule = new Schedule.RecurrenceRule();
+		completeOrderRule.second = 0;
+		completeOrderRule.minute = 0;
+		completeOrderRule.hour = 0;
+
 		Schedule.scheduleJob(logRule, async () => {
 			await this.dataRecordService.genLog();
 			await this.userRecordService.genLog();
@@ -39,6 +52,14 @@ export class ScheduleService {
 
 		Schedule.scheduleJob(completeOrderRule, async () => {
 			await this.orderService.completeOrder();
+		});
+
+		Schedule.scheduleJob(priceRule, async () => {
+			await this.integrationSummaryService.refreshPrice();
+		});
+
+		Schedule.scheduleJob(integrationRule, async () => {
+			await this.integrationSummaryService.updatePool();
 		});
 
 		Schedule.scheduleJob('*/1 * * * *', async () => {

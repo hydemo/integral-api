@@ -12,6 +12,8 @@ export const WithdrawSchema = new mongoose.Schema(
 		checkResult: { type: Number, enum: [1, 2, 3] },
 		// 审核人
 		reviewer: { type: ObjectId },
+		// 审核人
+		reviewTime: { type: Date },
 	},
 	{ collection: 'withdraw', versionKey: false, timestamps: true },
 );

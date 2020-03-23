@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ApiErrorCode } from '@common/enum/api-error-code.enum';
 import { ApiException } from '@common/expection/api.exception';
 import { WeixinUtil } from '@utils/weixin.util';
-import { ConfigService } from 'src/config/config.service';
 import { LoginDTO } from './login.dto';
 import { PaginationUtil } from 'src/utils/pagination.util';
 import { RedisService } from 'nestjs-redis';
@@ -23,7 +22,6 @@ export class UserService {
 		@Inject(WeixinUtil) private readonly weixinUtil: WeixinUtil,
 		@Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
 		@Inject(JwtService) private readonly jwtService: JwtService,
-		private readonly configService: ConfigService,
 		@Inject(PaginationUtil) private readonly paginationUtil: PaginationUtil,
 		private redis: RedisService,
 	) {}
@@ -62,7 +60,16 @@ export class UserService {
 			.skip((pagination.current - 1) * pagination.pageSize)
 			.sort({ createdAt: -1 })
 			.lean()
-			.exec();
+			.then(users => {
+				return users.map(item => {
+					if (item.phone) {
+						return { ...item, phone: this.cryptoUtil.aesDecrypt(item.phone) };
+					} else {
+						return item;
+					}
+				});
+			});
+
 		const total = await this.userModel.countDocuments(condition);
 		return { list, total };
 	}
@@ -155,6 +162,21 @@ export class UserService {
 			$unset: { blockTime: 1 },
 		});
 		return;
+	}
+
+	async getVerify(id: string) {
+		const user = await this.userModel.findById(id).lean();
+		if (!user) {
+			return {};
+		}
+		return {
+			realName: this.cryptoUtil.aesDecrypt(user.realName),
+			phone: this.cryptoUtil.aesDecrypt(user.realName),
+			cardNumber: this.cryptoUtil.aesDecrypt(user.cardNumber),
+			bank: user.bank,
+			bankAddress: user.bankAddress,
+			bankNumber: this.cryptoUtil.aesDecrypt(user.bankNumber),
+		};
 	}
 
 	// 修改余额

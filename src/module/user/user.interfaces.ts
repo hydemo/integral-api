@@ -40,4 +40,6 @@ export interface IUser extends Document {
 	readonly isVerify: boolean;
 	// 推广大使级别
 	readonly ambassadorLevel: number;
+	// 手机号
+	readonly phone: number;
 }

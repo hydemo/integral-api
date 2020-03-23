@@ -86,4 +86,13 @@ export class CMSUserController {
 	): Promise<any> {
 		return await this.userBalanceService.update(id, balance);
 	}
+
+	@Get('/:id/verify')
+	@ApiOkResponse({
+		description: '获取实名认证信息',
+	})
+	@ApiOperation({ title: '获取实名认证信息', description: '获取实名认证信息' })
+	async verify(@Param('id', new MongodIdPipe()) id: string): Promise<any> {
+		return await this.userService.getVerify(id);
+	}
 }

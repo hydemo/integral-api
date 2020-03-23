@@ -57,4 +57,43 @@ export class CMSAmbassadorCardController {
 			String(req.user._id),
 		);
 	}
+
+	@Put('/:id')
+	@Roles(1)
+	@ApiOkResponse({
+		description: '修改大使码',
+	})
+	@ApiOperation({ title: '修改大使码', description: '修改大使码' })
+	async update(
+		@Body() ambassadorCard: CreateAmbassadorCardDTO,
+		@Param('id', new MongodIdPipe()) id: string,
+	): Promise<any> {
+		return await this.ambassadorCardService.findByIdAndUpdate(
+			id,
+			ambassadorCard,
+		);
+	}
+
+	@Delete('/:id')
+	@Roles(1)
+	@ApiOkResponse({
+		description: '删除大使码',
+	})
+	@ApiOperation({ title: '删除大使码', description: '删除大使码' })
+	async remove(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.ambassadorCardService.findByIdAndRemove(id, req.user._id);
+	}
+
+	@Put('/:id/recover')
+	@Roles(1)
+	@ApiOkResponse({
+		description: '恢复大使码',
+	})
+	@ApiOperation({ title: '恢复大使码', description: '恢复大使码' })
+	async recover(@Param('id', new MongodIdPipe()) id: string): Promise<any> {
+		return await this.ambassadorCardService.recoverById(id);
+	}
 }

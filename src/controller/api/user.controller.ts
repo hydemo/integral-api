@@ -106,17 +106,17 @@ export class ApiUserController {
 		);
 	}
 
-	@Post('/vipCard')
-	@ApiOkResponse({
-		description: '使用会员卡',
-	})
-	@ApiOperation({ title: '使用会员卡', description: '使用会员卡' })
-	async vipCard(
-		@Body() vipCard: VipCardDTO,
-		@Request() req: any,
-	): Promise<any> {
-		return await this.vipCardService.useVipCard(vipCard, req.user._id);
-	}
+	// @Post('/vipCard')
+	// @ApiOkResponse({
+	// 	description: '使用会员卡',
+	// })
+	// @ApiOperation({ title: '使用会员卡', description: '使用会员卡' })
+	// async vipCard(
+	// 	@Body() vipCard: VipCardDTO,
+	// 	@Request() req: any,
+	// ): Promise<any> {
+	// 	return await this.vipCardService.useVipCard(vipCard, req.user._id);
+	// }
 
 	@Post('/ambassador')
 	@ApiOkResponse({
@@ -236,7 +236,7 @@ export class ApiUserController {
 	})
 	@ApiOperation({ title: '提现申请列表', description: '提现申请列表' })
 	async withdrawApplication(
-		@Query() withdraw: CreateWithdrawDTO,
+		@Body() withdraw: CreateWithdrawDTO,
 		@Request() req: any,
 	): Promise<any> {
 		return this.withdrawService.create(withdraw.amount, req.user);
