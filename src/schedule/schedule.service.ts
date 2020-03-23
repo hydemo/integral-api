@@ -26,7 +26,7 @@ export class ScheduleService {
 		console.log('222:', process.env.NODE_APP_INSTANCE);
 		const logRule = new Schedule.RecurrenceRule();
 		logRule.second = 0;
-		logRule.minute = 53;
+		logRule.minute = 0;
 		logRule.hour = 0;
 
 		const completeOrderRule = new Schedule.RecurrenceRule();
@@ -41,7 +41,7 @@ export class ScheduleService {
 
 		const integrationRule = new Schedule.RecurrenceRule();
 		integrationRule.second = 0;
-		integrationRule.minute = 47;
+		integrationRule.minute = 56;
 		integrationRule.hour = 0;
 
 		Schedule.scheduleJob(logRule, async () => {
