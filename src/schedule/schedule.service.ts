@@ -41,7 +41,7 @@ export class ScheduleService {
 
 		const integrationRule = new Schedule.RecurrenceRule();
 		integrationRule.second = 0;
-		integrationRule.minute = 43;
+		integrationRule.minute = 47;
 		integrationRule.hour = 0;
 
 		Schedule.scheduleJob(logRule, async () => {
