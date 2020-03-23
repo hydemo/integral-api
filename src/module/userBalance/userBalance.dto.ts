@@ -22,10 +22,10 @@ export class CreateUserBalanceDTO {
 	readonly sourceId?: string;
 
 	@IsNumber()
-	@IsEnum([1, 2])
+	@IsEnum([1, 2, 3])
 	@Type(() => Number)
 	@ApiModelProperty({
-		description: '来源类型 1:充值 2:线下扫码支付 3:线上支付 4:后台修改 ',
+		description: '来源类型: 1:退货退款积分返还 2:积分兑换 3:提现 ',
 	})
 	readonly sourceType: number;
 

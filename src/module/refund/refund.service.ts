@@ -37,8 +37,6 @@ export class RefundService {
 		@Inject(ShipperService) private readonly shipperService: ShipperService,
 		@Inject(UserBalanceService)
 		private readonly userBalanceService: UserBalanceService,
-		@Inject(UserCouponService)
-		private readonly userCouponService: UserCouponService,
 		@Inject(IntegrationService)
 		private readonly integrationService: IntegrationService,
 		@Inject(WeixinUtil) private readonly weixinUtil: WeixinUtil,
@@ -247,21 +245,14 @@ export class RefundService {
 		const refund = await this.refundModel.create(newRefund);
 		await this.orderService.refund(order._id, order.products);
 		if (order.integration && order.integration > 0) {
-			const integrationSummary = await this.integrationSummaryService.findOneByDate(
-				moment().format('YYYY-MM-DD'),
-			);
-			const integrationAmount = Number(
-				(order.integration * integrationSummary.integrationPrice).toFixed(2),
-			);
-			const newIntegration: CreateIntegrationDTO = {
-				user: order.user,
-				count: order.integration,
+			const balance: CreateUserBalanceDTO = {
+				amount: order.integrationAmount,
+				user: order.user._id,
 				type: 'add',
-				sourceType: 9,
 				sourceId: order._id,
-				amount: integrationAmount,
+				sourceType: 1,
 			};
-			await this.integrationService.create(newIntegration);
+			await this.userBalanceService.create(balance);
 		}
 		return await this.handleRefund(order, refund);
 	}
@@ -492,21 +483,6 @@ export class RefundService {
 			}
 			refundId = result.refund_id;
 		}
-		const integrationSummary = await this.integrationSummaryService.findOneByDate(
-			moment().format('YYYY-MM-DD'),
-		);
-		const integrationAmount = Number(
-			(order.integration * integrationSummary.integrationPrice).toFixed(2),
-		);
-		const newIntegration: CreateIntegrationDTO = {
-			user: order.user,
-			count: order.integration,
-			type: 'add',
-			sourceType: 9,
-			sourceId: order._id,
-			amount: integrationAmount,
-		};
-		await this.integrationService.create(newIntegration);
 		return await this.refundModel.findByIdAndUpdate(refund._id, {
 			checkResult: 4,
 			refundTime: Date.now(),

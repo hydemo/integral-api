@@ -143,7 +143,7 @@ export class CreateGoodDTO {
 	@IsMongoId()
 	@Type(() => String)
 	@ApiModelPropertyOptional({ description: '规格定价' })
-	readonly recommendUser: string;
+	recommendUser?: string;
 }
 
 export class UpdateProductDTO {

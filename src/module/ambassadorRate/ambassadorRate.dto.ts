@@ -1,8 +1,13 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber } from 'class-validator';
+import { IsNumber, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CreateIntegrationRateDTO {
+export class CreateAmbassadorRateDTO {
+	@IsNumber()
+	@Type(() => Number)
+	@ApiModelProperty({ description: '等级' })
+	readonly level: number;
+
 	@IsNumber()
 	@IsEnum([1, 2, 3, 4, 5, 6])
 	@Type(() => Number)
@@ -16,9 +21,4 @@ export class CreateIntegrationRateDTO {
 	@Type(() => Number)
 	@ApiModelProperty({ description: '比例' })
 	readonly rate: number;
-
-	@IsNumber()
-	@Type(() => Number)
-	@ApiModelProperty({ description: '会员比例' })
-	readonly vipRate: number;
 }

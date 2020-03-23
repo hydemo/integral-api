@@ -56,10 +56,6 @@ import { CMSCodeController } from './controller/cms/code.controller';
 import { NoticeModule } from './module/notice/notice.module';
 import { CMSNoticeController } from './controller/cms/notice.controller';
 import { ApiNoticeController } from './controller/api/notice.controller';
-// import { CouponModule } from './module/coupon/coupon.module';
-// import { CMSCouponController } from './controller/cms/coupon.controller';
-// import { UserCouponModule } from './module/userCoupon/userCoupon.module';
-// import { ApiCouponController } from './controller/api/coupon.controller';
 import { CMSCommentController } from './controller/cms/comment.controller';
 import { CMSUserBalanceController } from './controller/cms/userBalance.controller';
 import { UserBalanceModule } from './module/userBalance/userBalance.module';
@@ -82,6 +78,13 @@ import { CMSIntegrationRateController } from './controller/cms/integrationRate.c
 import { ServiceFeeModule } from './module/serviceFee/serviceFee.module';
 import { CMSServiceFeeController } from './controller/cms/serviceFee.controller';
 import { CMSAddressController } from './controller/cms/address.controller';
+import { WithdrawModule } from './module/withdraw/withdraw.module';
+import { CMSWithdrawController } from './controller/cms/withdraw.controller';
+import { AmbassadorCardModule } from './module/ambassadorCard/ambassadorCard.module';
+import { CMSAmbassadorCardController } from './controller/cms/ambassadorCard.controller';
+import { AmbassadorRateModule } from './module/ambassadorRate/ambassadorRate.module';
+import { CMSAmbassadorRateController } from './controller/cms/ambassadorRate.controller';
+import { ApiIntegrationController } from './controller/api/integration.controller';
 // import锚点
 
 @Module({
@@ -121,6 +124,9 @@ import { CMSAddressController } from './controller/cms/address.controller';
 		IntegrationSummaryModule,
 		IntegrationRateModule,
 		ServiceFeeModule,
+		WithdrawModule,
+		AmbassadorCardModule,
+		AmbassadorRateModule,
 		// module锚点
 		PassportModule.register({ defaultStrategy: 'jwt' }),
 		RedisModule.forRootAsync({
@@ -168,6 +174,10 @@ import { CMSAddressController } from './controller/cms/address.controller';
 		CMSIntegrationRateController,
 		CMSServiceFeeController,
 		CMSAddressController,
+		CMSWithdrawController,
+		CMSAmbassadorCardController,
+		CMSAmbassadorRateController,
+		ApiIntegrationController,
 		// controller锚点
 	],
 })

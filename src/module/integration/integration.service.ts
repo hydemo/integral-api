@@ -13,6 +13,9 @@ import { IntegrationRateService } from '../integrationRate/integrationRate.servi
 import { ServiceFeeService } from '../serviceFee/serviceFee.service';
 import * as moment from 'moment';
 import { CreateServiceFeeDTO } from '../serviceFee/serviceFee.dto';
+import { CreateUserBalanceDTO } from '../userBalance/userBalance.dto';
+import { UserBalanceService } from '../userBalance/userBalance.service';
+import { IUser } from '../user/user.interfaces';
 
 @Injectable()
 export class IntegrationService {
@@ -27,6 +30,8 @@ export class IntegrationService {
 		private readonly integrationRateService: IntegrationRateService,
 		@Inject(ServiceFeeService)
 		private readonly serviceFeeService: ServiceFeeService,
+		@Inject(UserBalanceService)
+		private readonly userBalanceService: UserBalanceService,
 	) {}
 
 	// 创建数据
@@ -74,6 +79,45 @@ export class IntegrationService {
 		return { list, total };
 	}
 
+	// 分页查询数据
+	async listByUser(
+		pagination: Pagination,
+		sourceType: number,
+		user: string,
+	): Promise<IList<IIntegration>> {
+		let populate = {};
+		const condition = this.paginationUtil.genCondition(pagination, []);
+		if (sourceType === 2) {
+			condition.user = user;
+			condition.sourceType = sourceType;
+			populate = {
+				path: 'sourceUser',
+				model: 'user',
+				select: '_id nickname',
+			};
+		} else if (sourceType === 3 || sourceType === 4) {
+			condition.user = user;
+			condition.sourceType = sourceType;
+			populate = {
+				path: 'good',
+				model: 'good',
+				select: '_id name',
+			};
+		} else {
+			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
+		}
+		const list = await this.integrationModel
+			.find(condition)
+			.limit(pagination.pageSize)
+			.skip((pagination.current - 1) * pagination.pageSize)
+			.sort({ createdAt: -1 })
+			.populate(populate)
+			.lean()
+			.exec();
+		const total = await this.integrationModel.countDocuments(condition);
+		return { list, total };
+	}
+
 	// 赠送积分
 	async giveIntegration(user: string, address: string, integration: number) {
 		if (integration < 0) {
@@ -115,25 +159,65 @@ export class IntegrationService {
 			user,
 			count: Number(integration.toFixed(3)),
 			type: 'minus',
-			sourceType: 10,
+			sourceType: 9,
 			amount: Number((integration * integrationPrice).toFixed(2)),
 		};
 		if (sourceId) {
 			giveIntegration.sourceId = sourceId;
 		}
 		await this.integrationModel.create(giveIntegration);
+		await this.userService.incIntegration(user, -integration);
 
 		const getIntegration: CreateIntegrationDTO = {
 			user: addressUser._id,
 			count: Number(getCount.toFixed(3)),
 			type: 'add',
-			sourceType: 10,
+			sourceType: 9,
 			amount: Number((getCount * integrationPrice).toFixed(2)),
 		};
 		if (sourceId) {
 			getIntegration.sourceId = sourceId;
 		}
 		await this.integrationModel.create(getIntegration);
+		await this.userService.incIntegration(addressUser._id, getCount);
+	}
+
+	// 赠送积分
+	async exchange(user: IUser, count: number) {
+		if (!count || count < 0) {
+			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
+		}
+		if (count > user.integration) {
+			throw new ApiException('积分不足', ApiErrorCode.INPUT_ERROR, 406);
+		}
+
+		const {
+			integrationPrice,
+		} = await this.integrationSummaryService.findOneByDate(
+			moment().format('YYYY-MM-DD'),
+		);
+		const amount = Number((count * integrationPrice).toFixed(2));
+		const newIntegration: CreateIntegrationDTO = {
+			user: user._id,
+			count: Number(count.toFixed(3)),
+			type: 'minus',
+			sourceType: 7,
+			amount,
+		};
+		const createIntegration: IIntegration = await this.integrationModel.create(
+			newIntegration,
+		);
+		await this.userService.incIntegration(user._id, -count);
+
+		const balance: CreateUserBalanceDTO = {
+			amount,
+			user: user._id,
+			type: 'add',
+			sourceId: createIntegration._id,
+			sourceType: 2,
+		};
+		await this.userBalanceService.create(balance);
+		return;
 	}
 
 	// 创建数据

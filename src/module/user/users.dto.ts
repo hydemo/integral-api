@@ -195,13 +195,12 @@ export class VerifyDTO {
 	@ApiModelProperty({ description: '身份证' })
 	readonly cardNumber: string;
 
-	@IsString()
+	@Validate(BankCardNoValidator)
 	@IsDefined()
 	@Type(() => String)
 	@ApiModelProperty({ description: '银行卡' })
 	readonly bankNumber: string;
 
-	@Validate(BankCardNoValidator)
 	@IsDefined()
 	@Type(() => String)
 	@ApiModelProperty({ description: '银行' })
@@ -211,10 +210,43 @@ export class VerifyDTO {
 	@IsDefined()
 	@Type(() => String)
 	@ApiModelProperty({ description: '开户行' })
-	readonly bandAddress: string;
+	readonly bankAddress: string;
 
 	@IsMobilePhone('zh-CN')
 	@IsDefined()
+	@Type(() => String)
+	@ApiModelPropertyOptional({ description: '手机号' })
+	readonly phone: string;
+}
+
+export class UpdateVerifyDTO {
+	@IsString()
+	@MinLength(2, { message: '姓名长度有误' })
+	@Type(() => String)
+	@ApiModelProperty({ description: '姓名' })
+	readonly realName: string;
+
+	@Validate(CardNumberValidator)
+	@Type(() => String)
+	@ApiModelProperty({ description: '身份证' })
+	readonly cardNumber: string;
+
+	@Validate(BankCardNoValidator)
+	@Type(() => String)
+	@ApiModelProperty({ description: '银行卡' })
+	readonly bankNumber: string;
+
+	@IsString()
+	@Type(() => String)
+	@ApiModelProperty({ description: '银行' })
+	readonly bank: string;
+
+	@IsString()
+	@Type(() => String)
+	@ApiModelProperty({ description: '开户行' })
+	readonly bankAddress: string;
+
+	@IsMobilePhone('zh-CN')
 	@Type(() => String)
 	@ApiModelPropertyOptional({ description: '手机号' })
 	readonly phone: string;

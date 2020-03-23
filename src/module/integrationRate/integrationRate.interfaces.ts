@@ -5,4 +5,6 @@ export interface IIntegrationRate extends Document {
 	readonly type: number;
 	// 比例
 	readonly rate: number;
+	// 会员比例
+	readonly vipRate: number;
 }

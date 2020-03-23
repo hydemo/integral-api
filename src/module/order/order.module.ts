@@ -20,6 +20,8 @@ import { IntegrationSummaryModule } from '../integrationSummary/integrationSumma
 import { IntegrationRateModule } from '../integrationRate/integrationRate.module';
 import { UserModule } from '../user/user.module';
 import { ServiceFeeModule } from '../serviceFee/serviceFee.module';
+import { AmbassadorRateService } from '../ambassadorRate/ambassadorRate.service';
+import { AmbassadorRateModule } from '../ambassadorRate/ambassadorRate.module';
 
 @Module({
 	providers: [OrderService, ...ordersProviders],
@@ -44,6 +46,7 @@ import { ServiceFeeModule } from '../serviceFee/serviceFee.module';
 		IntegrationRateModule,
 		UserModule,
 		ServiceFeeModule,
+		AmbassadorRateModule,
 	],
 })
 export class OrderModule {}

@@ -84,6 +84,6 @@ export class VipCardService {
 			useBy: user,
 			useTime: Date.now(),
 		});
-		return card.amount.toFixed(2);
+		return 'success';
 	}
 }

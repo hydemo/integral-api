@@ -21,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { OrderService } from 'src/module/order/order.service';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Pagination } from 'src/common/dto/pagination.dto';
 import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
 import {

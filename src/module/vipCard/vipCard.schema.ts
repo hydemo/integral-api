@@ -5,7 +5,7 @@ const ObjectId = mongoose.Types.ObjectId;
 export const VipCardSchema = new mongoose.Schema(
 	{
 		// 创建人
-		creator: ObjectId,
+		createBy: ObjectId,
 		// 是否使用
 		isUsed: { type: Boolean, default: false },
 		// 使用人

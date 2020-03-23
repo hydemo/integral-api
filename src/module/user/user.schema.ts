@@ -47,7 +47,7 @@ export const UserSchema = new mongoose.Schema(
 		// 身份证
 		cardNumber: { type: String, unique: true },
 		// 银行卡
-		bankCard: { type: String },
+		bankNumber: { type: String },
 		// 银行
 		bank: { type: String },
 		// 开户行
@@ -56,6 +56,8 @@ export const UserSchema = new mongoose.Schema(
 		integrationAddress: { type: String },
 		// 邀请人
 		inviteBy: { type: ObjectId },
+		// 推广大使级别
+		ambassadorLevel: { type: Number },
 	},
 	{ collection: 'user', versionKey: false, timestamps: true },
 );

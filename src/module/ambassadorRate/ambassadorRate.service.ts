@@ -5,38 +5,39 @@ import { ApiException } from '@common/expection/api.exception';
 import { Pagination } from 'src/common/dto/pagination.dto';
 import { PaginationUtil } from 'src/utils/pagination.util';
 import { IList } from 'src/common/interface/list.interface';
-import { CreateIntegrationRateDTO } from './integrationRate.dto';
-import { IIntegrationRate } from './integrationRate.interfaces';
+import { CreateAmbassadorRateDTO } from './ambassadorRate.dto';
+import { IAmbassadorRate } from './ambassadorRate.interfaces';
 
 @Injectable()
-export class IntegrationRateService {
+export class AmbassadorRateService {
 	constructor(
-		@Inject('IntegrationRateModelToken')
-		private readonly integrationRateModel: Model<IIntegrationRate>,
+		@Inject('AmbassadorRateModelToken')
+		private readonly ambassadorRateModel: Model<IAmbassadorRate>,
 		@Inject(PaginationUtil) private readonly paginationUtil: PaginationUtil,
 	) {}
 
 	// 创建数据
 	async create(
-		createIntegrationRateDTO: CreateIntegrationRateDTO,
+		createAmbassadorRateDTO: CreateAmbassadorRateDTO,
 		user: string,
-	): Promise<IIntegrationRate> {
-		const exist = await this.integrationRateModel.findOne({
-			type: createIntegrationRateDTO.type,
+	): Promise<IAmbassadorRate> {
+		const exist = await this.ambassadorRateModel.findOne({
+			type: createAmbassadorRateDTO.type,
+			level: createAmbassadorRateDTO.level,
 		});
 		if (exist) {
 			throw new ApiException('分发比例已存在', ApiErrorCode.EXIST, 406);
 		}
-		return await this.integrationRateModel.create({
-			...createIntegrationRateDTO,
+		return await this.ambassadorRateModel.create({
+			...createAmbassadorRateDTO,
 			createBy: user,
 		});
 	}
 
 	// 分页查询数据
-	async list(pagination: Pagination): Promise<IList<IIntegrationRate>> {
+	async list(pagination: Pagination): Promise<IList<IAmbassadorRate>> {
 		const condition = this.paginationUtil.genCondition(pagination, []);
-		const list = await this.integrationRateModel
+		const list = await this.ambassadorRateModel
 			.find(condition)
 			.limit(pagination.pageSize)
 			.skip((pagination.current - 1) * pagination.pageSize)
@@ -47,31 +48,32 @@ export class IntegrationRateService {
 			})
 			.sort({ createdAt: -1 })
 			.lean();
-		const total = await this.integrationRateModel.countDocuments(condition);
+		const total = await this.ambassadorRateModel.countDocuments(condition);
 		return { list, total };
 	}
 
 	// 修改数据
 	async update(
 		id: string,
-		createIntegrationRateDTO: CreateIntegrationRateDTO,
-	): Promise<IIntegrationRate | null> {
-		const exist = await this.integrationRateModel.findOne({
+		createAmbassadorRateDTO: CreateAmbassadorRateDTO,
+	): Promise<IAmbassadorRate | null> {
+		const exist = await this.ambassadorRateModel.findOne({
 			_id: { $ne: id },
-			type: createIntegrationRateDTO.type,
+			type: createAmbassadorRateDTO.type,
+			level: createAmbassadorRateDTO.level,
 		});
 		if (exist) {
 			throw new ApiException('分发比例已存在', ApiErrorCode.EXIST, 406);
 		}
-		return await this.integrationRateModel.findByIdAndUpdate(
+		return await this.ambassadorRateModel.findByIdAndUpdate(
 			id,
-			createIntegrationRateDTO,
+			createAmbassadorRateDTO,
 		);
 	}
 
 	// 详情
-	async detail(id: string): Promise<IIntegrationRate> {
-		const integrationRate = await this.integrationRateModel.findById(id).lean();
+	async detail(id: string): Promise<IAmbassadorRate> {
+		const integrationRate = await this.ambassadorRateModel.findById(id).lean();
 		if (!integrationRate) {
 			throw new ApiException('数据不存在', ApiErrorCode.NO_EXIST, 404);
 		}
@@ -80,20 +82,17 @@ export class IntegrationRateService {
 
 	// 软删除
 	async remove(id: string) {
-		return await this.integrationRateModel.findByIdAndDelete(id);
+		return await this.ambassadorRateModel.findByIdAndDelete(id);
 	}
 
 	// 恢复
-	async getRate() {
+	async getRate(level: number) {
 		const result: any = {};
-		const list: IIntegrationRate[] = await this.integrationRateModel
-			.find({ isDelete: false })
+		const list: IAmbassadorRate[] = await this.ambassadorRateModel
+			.find({ isDelete: false, level })
 			.lean();
 		list.map(li => {
 			result[li.type] = li.rate;
-			if (li.vipRate) {
-				result[`vip_${li.type}`] = li.rate;
-			}
 			return null;
 		});
 		return result;

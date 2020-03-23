@@ -6,6 +6,7 @@ import { UserModule } from '../user/user.module';
 import { ServiceFeeModule } from '../serviceFee/serviceFee.module';
 import { IntegrationRateModule } from '../integrationRate/integrationRate.module';
 import { IntegrationSummaryModule } from '../integrationSummary/integrationSummary.module';
+import { UserBalanceModule } from '../userBalance/userBalance.module';
 
 @Module({
 	providers: [IntegrationService, ...integrationProviders],
@@ -15,6 +16,7 @@ import { IntegrationSummaryModule } from '../integrationSummary/integrationSumma
 		DatabaseModule,
 		ServiceFeeModule,
 		IntegrationRateModule,
+		UserBalanceModule,
 		IntegrationSummaryModule,
 	],
 })

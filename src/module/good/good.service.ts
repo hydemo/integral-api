@@ -81,7 +81,7 @@ export class GoodService {
 	}
 
 	// 列表
-	async list(pagination: Pagination, admin: IAdmin): Promise<IList<IGood>> {
+	async list(pagination: Pagination): Promise<IList<IGood>> {
 		const condition = this.paginationUtil.genCondition(pagination, [
 			'name',
 			'keyword',
@@ -92,6 +92,11 @@ export class GoodService {
 			.skip((pagination.current - 1) * pagination.pageSize)
 			.sort({ sort: 1 })
 			.populate({ path: 'creator', model: 'admin', select: '_id nickname' })
+			.populate({
+				path: 'recommendUser',
+				model: 'user',
+				select: '_id nickname',
+			})
 			.lean()
 			.exec();
 		const list: IGood[] = await Promise.all(
@@ -192,6 +197,9 @@ export class GoodService {
 					preSaleSendTime: 1,
 				},
 			});
+		}
+		if (!good.recommendUser) {
+			good.recommendUser = undefined;
 		}
 		await this.goodModel.findByIdAndUpdate(id, good);
 		return true;

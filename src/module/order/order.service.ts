@@ -50,6 +50,7 @@ import { IntegrationRateService } from '../integrationRate/integrationRate.servi
 import { UserService } from '../user/user.service';
 import { ServiceFeeService } from '../serviceFee/serviceFee.service';
 import { CreateServiceFeeDTO } from '../serviceFee/serviceFee.dto';
+import { AmbassadorRateService } from '../ambassadorRate/ambassadorRate.service';
 
 @Injectable()
 export class OrderService {
@@ -82,6 +83,8 @@ export class OrderService {
 		private readonly userService: UserService,
 		@Inject(ServiceFeeService)
 		private readonly serviceFeeService: ServiceFeeService,
+		@Inject(AmbassadorRateService)
+		private readonly ambassadorRateService: AmbassadorRateService,
 		private readonly redis: RedisService,
 	) {}
 
@@ -166,10 +169,14 @@ export class OrderService {
 		if (!good || !good.onSale) {
 			throw new ApiException('商品已下架', ApiErrorCode.NO_EXIST, 404);
 		}
+		let recommendUser = order.recommendUser;
+		if (String(order.recommendUser) === String(user._id)) {
+			recommendUser = '';
+		}
 		const productDTO: OrderProductDTO = await this.genPromote(
 			order.product,
 			order.count,
-			order.recommendUser,
+			recommendUser,
 		);
 
 		return await this.createOrder(user, [productDTO]);
@@ -287,7 +294,12 @@ export class OrderService {
 		const newOrder = await this.orderModel.findByIdAndUpdate(id, update, {
 			new: true,
 		});
-		return await this.payOrder(newOrder, user._id);
+		if (!newOrder) {
+			return;
+		}
+		console.log(newOrder, 'order');
+		// return await this.payOrder(newOrder, user._id);
+		await this.paySuccess(newOrder, '', 1);
 	}
 
 	// 微信支付订单
@@ -540,7 +552,6 @@ export class OrderService {
 				},
 			})
 			.populate({ path: 'products.good', model: 'good' })
-			.populate({ path: 'shop', model: 'merchant' })
 			.lean()
 			.exec();
 		if (!data) {
@@ -582,21 +593,14 @@ export class OrderService {
 			});
 		}
 		if (order.integration && order.integration > 0) {
-			const integrationSummary = await this.integrationSummaryService.findOneByDate(
-				moment().format('YYYY-MM-DD'),
-			);
-			const integrationAmount = Number(
-				(order.integration * integrationSummary.integrationPrice).toFixed(2),
-			);
-			const newIntegration: CreateIntegrationDTO = {
+			const balance: CreateUserBalanceDTO = {
+				amount: order.actualPrice,
 				user: order.user,
-				count: order.integration,
 				type: 'add',
-				sourceType: 9,
 				sourceId: order._id,
-				amount: integrationAmount,
+				sourceType: 1,
 			};
-			await this.integrationService.create(newIntegration);
+			await this.userBalanceService.create(balance);
 		}
 		return null;
 	}
@@ -629,8 +633,9 @@ export class OrderService {
 		serviceFee: number,
 		sourceId: string,
 		sourceType: number,
-		user?: string,
-		good?: string,
+		user: string,
+		good: string,
+		sourceUser: string,
 	): Promise<number> {
 		const {
 			integrationPrice,
@@ -638,27 +643,55 @@ export class OrderService {
 			moment().format('YYYY-MM-DD'),
 		);
 
+		const integrationUser = await this.userService.findById(user);
+		if (!integrationUser) {
+			throw new ApiException('用户不存在', ApiErrorCode.NO_EXIST, 404);
+		}
 		if (!integrationPrice && integrationPrice < 0) {
 			throw new ApiException('积分价格有误', ApiErrorCode.INTERNAL_ERROR, 500);
 		}
 		const integrationRates = await this.integrationRateService.getRate();
 		const rate = integrationRates[sourceType];
-		if (!rate) {
+		const vipRate = integrationRates[`vip_${sourceType}`];
+
+		let isVip = false;
+		let ambassadorLevel = 0;
+		const amount = Number(((serviceFee * rate) / 100).toFixed(2));
+		let userAmount = amount;
+
+		if (integrationUser.ambassadorLevel) {
+			ambassadorLevel = integrationUser.ambassadorLevel;
+			isVip = false;
+			const ambassadorRates = await this.ambassadorRateService.getRate(
+				ambassadorLevel,
+			);
+			const ambassadorRate = ambassadorRates[sourceType];
+			userAmount = Number(((serviceFee * ambassadorRate) / 100).toFixed(2));
+		}
+		if (vipRate) {
+			isVip = true;
+			userAmount = Number(((serviceFee * vipRate) / 100).toFixed(2));
+		}
+		if (!rate && !ambassadorLevel && !isVip) {
 			return 0;
 		}
-		const amount = Number(((serviceFee * rate) / 100).toFixed(2));
 		const integration: CreateIntegrationDTO = {
-			count: Number((amount / integrationPrice).toFixed(3)),
+			count: Number((userAmount / integrationPrice).toFixed(3)),
 			type: 'add',
 			sourceType,
 			sourceId,
-			amount,
+			amount: userAmount,
+			isVip,
+			ambassadorLevel,
 		};
 		if (user) {
 			integration.user = user;
 		}
 		if (good) {
 			integration.good = good;
+		}
+		if (sourceUser) {
+			integration.sourceUser = sourceUser;
 		}
 		await this.integrationService.create(integration);
 		return amount;
@@ -681,6 +714,7 @@ export class OrderService {
 						3,
 						product.recommendUser,
 						product.good._id,
+						order.user._id,
 					);
 				}
 				// 上架推广人积分发放
@@ -691,6 +725,7 @@ export class OrderService {
 						4,
 						product.good.recommendUser,
 						product.good._id,
+						order.user._id,
 					);
 				}
 			}),
@@ -701,6 +736,8 @@ export class OrderService {
 			order._id,
 			1,
 			order.user._id,
+			'',
+			order.user._id,
 		);
 		// 推荐人积分发放
 		if (order.user.inviteBy) {
@@ -709,10 +746,12 @@ export class OrderService {
 				order._id,
 				2,
 				order.user.inviteBy,
+				'',
+				order.user._id,
 			);
 		}
 		// 平台服务费额外发放
-		await this.createIntegration(serviceFeeTotal, order._id, 5);
+		await this.createIntegration(serviceFeeTotal, order._id, 5, '', '', '');
 		const serviceFeeDTO: CreateServiceFeeDTO = {
 			totalFee: Number(serviceFeeTotal.toFixed(2)),
 			minusFee: Number((serviceFeeTotal - serviceFeeMinus).toFixed(2)),
@@ -775,7 +814,6 @@ export class OrderService {
 				},
 			})
 			.populate({ path: 'products.good', model: 'good' })
-			.populate({ path: 'shop', model: 'merchant' })
 			.populate({
 				path: 'user',
 				model: 'user',

@@ -11,7 +11,7 @@ import { ConfigService } from 'src/config/config.service';
 import { LoginDTO } from './login.dto';
 import { PaginationUtil } from 'src/utils/pagination.util';
 import { RedisService } from 'nestjs-redis';
-import { VerifyDTO } from './users.dto';
+import { VerifyDTO, UpdateVerifyDTO } from './users.dto';
 import { CryptoUtil } from 'src/utils/crypto.util';
 import * as moment from 'moment';
 
@@ -193,17 +193,19 @@ export class UserService {
 			phone: this.cryptoUtil.aesEncrypt(verify.phone),
 			cardNumber: this.cryptoUtil.aesEncrypt(verify.cardNumber),
 			bank: verify.bank,
-			bandAddress: verify.bandAddress,
+			bankAddress: verify.bankAddress,
 			bankNumber: this.cryptoUtil.aesEncrypt(verify.bankNumber),
 		};
 		const phoneExist = await this.userModel.findOne({
 			phone: signVerify.phone,
+			_id: { $ne: user },
 		});
 		if (phoneExist) {
 			throw new ApiException('手机号已注册', ApiErrorCode.EXIST, 406);
 		}
 		const cardNumberExist = await this.userModel.findOne({
 			cardNumber: signVerify.cardNumber,
+			_id: { $ne: user },
 		});
 		if (cardNumberExist) {
 			throw new ApiException('身份证已注册', ApiErrorCode.EXIST, 406);
@@ -211,6 +213,44 @@ export class UserService {
 		await this.userModel.findByIdAndUpdate(user, {
 			...signVerify,
 			isVerify: true,
+		});
+		return;
+	}
+
+	// 更改实名认证
+	async updateVerify(verify: UpdateVerifyDTO, user: IUser) {
+		if (!user.isVerify) {
+			throw new ApiException('还未实名认证', ApiErrorCode.NO_PERMISSION, 403);
+		}
+		const update: any = { ...verify };
+		if (verify.phone) {
+			update.phone = this.cryptoUtil.aesEncrypt(verify.phone);
+			const phoneExist = await this.userModel.findOne({
+				phone: update.phone,
+				_id: { $ne: user._id },
+			});
+			if (phoneExist) {
+				throw new ApiException('手机号已注册', ApiErrorCode.EXIST, 406);
+			}
+		}
+		if (verify.cardNumber) {
+			update.cardNumber = this.cryptoUtil.aesEncrypt(verify.cardNumber);
+			const cardNumberExist = await this.userModel.findOne({
+				cardNumber: update.cardNumber,
+				_id: { $ne: user._id },
+			});
+			if (cardNumberExist) {
+				throw new ApiException('身份证已注册', ApiErrorCode.EXIST, 406);
+			}
+		}
+		if (verify.realName) {
+			update.realName = this.cryptoUtil.aesEncrypt(verify.realName);
+		}
+		if (verify.bankNumber) {
+			update.bankNumber = this.cryptoUtil.aesEncrypt(verify.bankNumber);
+		}
+		await this.userModel.findByIdAndUpdate(user._id, {
+			...update,
 		});
 		return;
 	}
@@ -229,6 +269,17 @@ export class UserService {
 		await this.userModel.findByIdAndUpdate(user, {
 			vipExpire: newExpire,
 		});
+		return;
+	}
+
+	// 充值vip
+	async changeAmbassadorLevel(id: string, ambassadorLevel: number) {
+		const user = await this.userModel.findById(id);
+		if (!user) {
+			throw new ApiException('用户不存在', ApiErrorCode.NO_EXIST, 404);
+		}
+
+		await this.userModel.findByIdAndUpdate(user, { ambassadorLevel });
 		return;
 	}
 }

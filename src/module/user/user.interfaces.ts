@@ -36,4 +36,8 @@ export interface IUser extends Document {
 	readonly vipExpire: Date;
 	// 邀请人
 	readonly inviteBy: string;
+	// 是否实名认证
+	readonly isVerify: boolean;
+	// 推广大使级别
+	readonly ambassadorLevel: number;
 }

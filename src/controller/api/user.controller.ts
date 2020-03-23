@@ -6,6 +6,7 @@ import {
 	UseGuards,
 	Inject,
 	Request,
+	Put,
 	Query,
 } from '@nestjs/common';
 import {
@@ -20,12 +21,17 @@ import {
 	VipCardDTO,
 	VerifyDTO,
 	GiveIntegrationDTO,
+	UpdateVerifyDTO,
 } from 'src/module/user/users.dto';
 import { UserService } from 'src/module/user/user.service';
 import { CryptoUtil } from 'src/utils/crypto.util';
 import { IntegrationService } from 'src/module/integration/integration.service';
 import { Pagination } from 'src/common/dto/pagination.dto';
 import { GoodService } from 'src/module/good/good.service';
+import { ExchangeDTO } from 'src/module/integration/integration.dto';
+import { CreateWithdrawDTO } from 'src/module/withdraw/withdraw.dto';
+import { WithdrawService } from 'src/module/withdraw/withdraw.service';
+import { AmbassadorCardService } from 'src/module/ambassadorCard/ambassadorCard.service';
 
 @ApiUseTags('user')
 @ApiForbiddenResponse({ description: 'Unauthorized' })
@@ -37,7 +43,9 @@ export class ApiUserController {
 		@Inject(UserService) private userService: UserService,
 		@Inject(IntegrationService) private integrationService: IntegrationService,
 		@Inject(CryptoUtil) private cryptoUtil: CryptoUtil,
-		@Inject(GoodService) private goodService: GoodService,
+		@Inject(WithdrawService) private withdrawService: WithdrawService,
+		@Inject(AmbassadorCardService)
+		private ambassadorCardService: AmbassadorCardService,
 	) {}
 
 	@Get('/balance')
@@ -83,16 +91,46 @@ export class ApiUserController {
 		);
 	}
 
+	@Post('/integration/exchange')
+	@ApiOkResponse({
+		description: '积分兑换',
+	})
+	@ApiOperation({ title: '积分兑换', description: '积分兑换' })
+	async exchange(
+		@Body() integration: ExchangeDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.integrationService.exchange(
+			req.user._id,
+			integration.count,
+		);
+	}
+
 	@Post('/vipCard')
 	@ApiOkResponse({
-		description: '充值升级vip',
+		description: '使用会员卡',
 	})
-	@ApiOperation({ title: '充值升级vip', description: '充值升级vip' })
+	@ApiOperation({ title: '使用会员卡', description: '使用会员卡' })
 	async vipCard(
 		@Body() vipCard: VipCardDTO,
 		@Request() req: any,
 	): Promise<any> {
 		return await this.vipCardService.useVipCard(vipCard, req.user._id);
+	}
+
+	@Post('/ambassador')
+	@ApiOkResponse({
+		description: '使用大使码',
+	})
+	@ApiOperation({ title: '使用大使码', description: '使用大使码' })
+	async ambassadorCard(
+		@Body() vipCard: VipCardDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.ambassadorCardService.useAmbassadorCard(
+			vipCard,
+			req.user._id,
+		);
 	}
 
 	@Post('/verify')
@@ -104,36 +142,71 @@ export class ApiUserController {
 		return await this.userService.verify(verify, req.user._id);
 	}
 
+	@Put('/verify')
+	@ApiOkResponse({
+		description: '修改实名认证',
+	})
+	@ApiOperation({ title: '修改实名认证', description: '修改实名认证' })
+	async updateVerify(
+		@Body() verify: UpdateVerifyDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.userService.updateVerify(verify, req.user);
+	}
+
 	@Get('/verify')
 	@ApiOkResponse({
 		description: '获取实名认证详情',
 	})
 	@ApiOperation({ title: '获取实名认证详情', description: '获取实名认证详情' })
 	async verifyInfo(@Request() req: any): Promise<any> {
+		if (!req.user.isVerify) {
+			return null;
+		}
 		const signVerify: VerifyDTO = {
-			realName: this.cryptoUtil.signName(req.user.realName),
-			phone: this.cryptoUtil.aesEncrypt(req.user.phone),
-			cardNumber: this.cryptoUtil.aesEncrypt(req.user.cardNumber),
+			realName: req.user.realName
+				? this.cryptoUtil.signName(req.user.realName)
+				: '',
+			phone: req.user.phone
+				? this.cryptoUtil.signLongString(req.user.phone)
+				: '',
+			cardNumber: req.user.cardNumber
+				? this.cryptoUtil.signLongString(req.user.cardNumber)
+				: '',
 			bank: req.user.bank,
-			bandAddress: req.user.bandAddress,
-			bankNumber: this.cryptoUtil.aesEncrypt(req.user.bankNumber),
+			bankAddress: req.user.bankAddress,
+			bankNumber: req.user.bankNumber
+				? this.cryptoUtil.signLongString(req.user.bankNumber)
+				: '',
 		};
 		return signVerify;
 	}
 
-	@Get('/invite')
+	@Get('/integrations/invite')
 	@ApiOkResponse({
-		description: '邀请用户列表',
+		description: '推荐新人列表',
 	})
-	@ApiOperation({ title: '邀请用户列表', description: '邀请用户列表' })
+	@ApiOperation({ title: '推荐新人列表', description: '推荐新人列表' })
 	async invite(
 		@Query() pagination: Pagination,
 		@Request() req: any,
 	): Promise<any> {
-		return this.userService.list(pagination, req.user._id);
+		return this.integrationService.listByUser(pagination, 2, req.user._id);
 	}
 
-	@Get('/goods')
+	@Get('/integrations/share')
+	@ApiOkResponse({
+		description: '分享商品',
+	})
+	@ApiOperation({ title: '分享商品', description: '分享商品' })
+	async share(
+		@Query() pagination: Pagination,
+		@Request() req: any,
+	): Promise<any> {
+		return this.integrationService.listByUser(pagination, 3, req.user._id);
+	}
+
+	@Get('/integrations/goods')
 	@ApiOkResponse({
 		description: '上架推广商品',
 	})
@@ -142,8 +215,30 @@ export class ApiUserController {
 		@Query() pagination: Pagination,
 		@Request() req: any,
 	): Promise<any> {
-		return this.goodService.listByUser(pagination, {
-			recommendUser: req.user._id,
-		});
+		return this.integrationService.listByUser(pagination, 4, req.user._id);
+	}
+
+	@Get('/withdraws')
+	@ApiOkResponse({
+		description: '提现申请列表',
+	})
+	@ApiOperation({ title: '提现申请列表', description: '提现申请列表' })
+	async withdraws(
+		@Query() pagination: Pagination,
+		@Request() req: any,
+	): Promise<any> {
+		return this.withdrawService.listByUser(pagination, req.user._id);
+	}
+
+	@Post('/withdraws')
+	@ApiOkResponse({
+		description: '提现申请列表',
+	})
+	@ApiOperation({ title: '提现申请列表', description: '提现申请列表' })
+	async withdrawApplication(
+		@Query() withdraw: CreateWithdrawDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return this.withdrawService.create(withdraw.amount, req.user);
 	}
 }

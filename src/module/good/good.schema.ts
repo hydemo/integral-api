@@ -61,7 +61,7 @@ export const GoodSchema = new mongoose.Schema(
 		// 审核状态啊
 		checkResult: { type: Number, enum: [1, 2, 3], default: 2 },
 		// 上架推广人
-		recommendUser: { type: Object },
+		recommendUser: { type: ObjectId },
 	},
 	{ collection: 'good', versionKey: false, timestamps: true },
 );

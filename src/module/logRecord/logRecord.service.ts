@@ -76,6 +76,10 @@ const eunms = {
 		module: 'integrationSummary',
 		description: '积分汇总',
 	},
+	withdraws: {
+		module: 'withdraw',
+		description: '提现',
+	},
 };
 const validator = new Validator();
 
@@ -113,6 +117,45 @@ export class LogService {
 				module: object.module,
 				description: '修改承兑池金额',
 				method,
+				interface: url,
+			};
+			return await this.logModel.create(newLog);
+		}
+
+		// 提现特殊处理
+		if (
+			method === 'PUT' &&
+			urls.length === 5 &&
+			validator.isMongoId(urls[3]) &&
+			urls[4] === 'acccept' &&
+			object.module === 'withdraw'
+		) {
+			const newLog: CreateLogDTO = {
+				user,
+				ip,
+				module: object.module,
+				description: '提现申请完成处理',
+				method,
+				bondToObjectId: urls[3],
+				interface: url,
+			};
+			return await this.logModel.create(newLog);
+		}
+
+		if (
+			method === 'PUT' &&
+			urls.length === 5 &&
+			validator.isMongoId(urls[3]) &&
+			urls[4] === 'reject' &&
+			object.module === 'withdraw'
+		) {
+			const newLog: CreateLogDTO = {
+				user,
+				ip,
+				module: object.module,
+				description: '拒绝提现申请',
+				method,
+				bondToObjectId: urls[3],
 				interface: url,
 			};
 			return await this.logModel.create(newLog);
