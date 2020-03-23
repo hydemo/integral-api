@@ -23,6 +23,11 @@ export class InitService {
 	) {}
 
 	async init() {
+		console.log(
+			moment()
+				.add(-1, 'd')
+				.format('YYYY-MM-DD'),
+		);
 		await this.integrationSummaryService.init();
 		// const check = this.idCardNoUtil.getIdCardInfo('350583198912246076')
 		// console.log(check, 'sss')

@@ -40,7 +40,7 @@ export class ScheduleService {
 
 		const integrationRule = new Schedule.RecurrenceRule();
 		integrationRule.second = 0;
-		integrationRule.minute = 40;
+		integrationRule.minute = 43;
 		integrationRule.hour = 0;
 
 		Schedule.scheduleJob(logRule, async () => {
@@ -53,7 +53,9 @@ export class ScheduleService {
 		});
 
 		Schedule.scheduleJob(completeOrderRule, async () => {
+			console.log('aaaa:', process.env.NODE_APP_INSTANCE);
 			if (process.env.NODE_APP_INSTANCE === '0') {
+				console.log('bbb:', process.env.NODE_APP_INSTANCE);
 				await this.orderService.completeOrder();
 			}
 		});

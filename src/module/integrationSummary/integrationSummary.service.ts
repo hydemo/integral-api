@@ -103,7 +103,7 @@ export class IntegrationSummaryService {
 		const summaryOfToday: IIntegrationSummary | null = await this.integrationSummaryModel
 			.findOne({
 				date: moment()
-					.add(-1)
+					.add(-1, 'd')
 					.format('YYYY-MM-DD'),
 			})
 			.lean();
