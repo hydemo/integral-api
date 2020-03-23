@@ -26,7 +26,7 @@ export class ScheduleService {
 		console.log('222:', process.env.NODE_APP_INSTANCE);
 		const logRule = new Schedule.RecurrenceRule();
 		logRule.second = 0;
-		logRule.minute = 1;
+		logRule.minute = 53;
 		logRule.hour = 0;
 
 		const completeOrderRule = new Schedule.RecurrenceRule();
@@ -54,9 +54,7 @@ export class ScheduleService {
 		});
 
 		Schedule.scheduleJob(completeOrderRule, async () => {
-			console.log('aaaa:', process.env.NODE_APP_INSTANCE);
 			if (process.env.NODE_APP_INSTANCE === '0') {
-				console.log('bbb:', process.env.NODE_APP_INSTANCE);
 				await this.orderService.completeOrder();
 			}
 		});
@@ -68,7 +66,9 @@ export class ScheduleService {
 		});
 
 		Schedule.scheduleJob(integrationRule, async () => {
+			console.log('aaaa:', process.env.NODE_APP_INSTANCE);
 			if (process.env.NODE_APP_INSTANCE === '0') {
+				console.log('bbb:', process.env.NODE_APP_INSTANCE);
 				await this.integrationSummaryService.updatePool();
 			}
 		});
