@@ -47,11 +47,8 @@ export class CMSGoodController {
 		description: '商品列表',
 	})
 	@ApiOperation({ title: '商品列表', description: '商品列表' })
-	async list(
-		@Query() pagination: Pagination,
-		@Request() req: any,
-	): Promise<any> {
-		return await this.goodService.list(pagination, req.user);
+	async list(@Query() pagination: Pagination): Promise<any> {
+		return await this.goodService.list(pagination);
 	}
 
 	@Post('/')
