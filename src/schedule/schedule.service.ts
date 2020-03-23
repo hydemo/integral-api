@@ -23,6 +23,7 @@ export class ScheduleService {
 	) {}
 
 	async enableSchedule() {
+		console.log('222:', process.env.NODE_APP_INSTANCE);
 		const logRule = new Schedule.RecurrenceRule();
 		logRule.second = 0;
 		logRule.minute = 1;
