@@ -23,7 +23,6 @@ export class InitService {
 	) {}
 
 	async init() {
-		console.log(process.env.NODE_APP_INSTANCE, 'sss');
 		await this.integrationSummaryService.init();
 		// const check = this.idCardNoUtil.getIdCardInfo('350583198912246076')
 		// console.log(check, 'sss')

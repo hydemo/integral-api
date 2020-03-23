@@ -40,30 +40,40 @@ export class ScheduleService {
 
 		const integrationRule = new Schedule.RecurrenceRule();
 		integrationRule.second = 0;
-		integrationRule.minute = 0;
+		integrationRule.minute = 40;
 		integrationRule.hour = 0;
 
 		Schedule.scheduleJob(logRule, async () => {
-			await this.dataRecordService.genLog();
-			await this.userRecordService.genLog();
-			await this.categoryRecordService.genLog();
-			await this.goodRecordService.genLog();
+			if (process.env.NODE_APP_INSTANCE === '0') {
+				await this.dataRecordService.genLog();
+				await this.userRecordService.genLog();
+				await this.categoryRecordService.genLog();
+				await this.goodRecordService.genLog();
+			}
 		});
 
 		Schedule.scheduleJob(completeOrderRule, async () => {
-			await this.orderService.completeOrder();
+			if (process.env.NODE_APP_INSTANCE === '0') {
+				await this.orderService.completeOrder();
+			}
 		});
 
 		Schedule.scheduleJob(priceRule, async () => {
-			await this.integrationSummaryService.refreshPrice();
+			if (process.env.NODE_APP_INSTANCE === '0') {
+				await this.integrationSummaryService.refreshPrice();
+			}
 		});
 
 		Schedule.scheduleJob(integrationRule, async () => {
-			await this.integrationSummaryService.updatePool();
+			if (process.env.NODE_APP_INSTANCE === '0') {
+				await this.integrationSummaryService.updatePool();
+			}
 		});
 
 		Schedule.scheduleJob('*/1 * * * *', async () => {
-			await this.orderService.clearOrder();
+			if (process.env.NODE_APP_INSTANCE === '0') {
+				await this.orderService.clearOrder();
+			}
 		});
 	}
 }
