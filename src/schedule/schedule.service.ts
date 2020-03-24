@@ -38,17 +38,13 @@ export class ScheduleService {
 		priceRule.minute = 0;
 		priceRule.hour = 20;
 
-		const integrationRule = new Schedule.RecurrenceRule();
-		integrationRule.second = 0;
-		integrationRule.minute = 56;
-		integrationRule.hour = 0;
-
 		Schedule.scheduleJob(logRule, async () => {
 			if (process.env.NODE_APP_INSTANCE === '0') {
 				await this.dataRecordService.genLog();
 				await this.userRecordService.genLog();
 				await this.categoryRecordService.genLog();
 				await this.goodRecordService.genLog();
+				await this.integrationSummaryService.updatePool();
 			}
 		});
 
@@ -61,12 +57,6 @@ export class ScheduleService {
 		Schedule.scheduleJob(priceRule, async () => {
 			if (process.env.NODE_APP_INSTANCE === '0') {
 				await this.integrationSummaryService.refreshPrice();
-			}
-		});
-
-		Schedule.scheduleJob(integrationRule, async () => {
-			if (process.env.NODE_APP_INSTANCE === '0') {
-				await this.integrationSummaryService.updatePool();
 			}
 		});
 

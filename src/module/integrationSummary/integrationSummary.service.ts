@@ -93,7 +93,7 @@ export class IntegrationSummaryService {
 		}
 		await this.integrationSummaryModel.findByIdAndUpdate(data._id, {
 			integrationPrice: data.integration
-				? Number((data.amount / data.integration).toFixed(2))
+				? Number((data.amount / data.integration).toFixed(5))
 				: 0.01,
 		});
 	}
