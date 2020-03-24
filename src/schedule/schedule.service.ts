@@ -23,7 +23,6 @@ export class ScheduleService {
 	) {}
 
 	async enableSchedule() {
-		console.log('222:', process.env.NODE_APP_INSTANCE);
 		const logRule = new Schedule.RecurrenceRule();
 		logRule.second = 0;
 		logRule.minute = 0;
@@ -66,9 +65,7 @@ export class ScheduleService {
 		});
 
 		Schedule.scheduleJob(integrationRule, async () => {
-			console.log('aaaa:', process.env.NODE_APP_INSTANCE);
 			if (process.env.NODE_APP_INSTANCE === '0') {
-				console.log('bbb:', process.env.NODE_APP_INSTANCE);
 				await this.integrationSummaryService.updatePool();
 			}
 		});

@@ -18,6 +18,7 @@ import {
 	CreateOrderByCartDTO,
 	ConfirmOrderDTO,
 	UpdatePriceDTO,
+	OrderMessageDTO,
 } from './order.dto';
 import { AddressService } from '../address/address.service';
 import { IAddress } from '../address/address.interfaces';
@@ -764,13 +765,15 @@ export class OrderService {
 		}
 		// 平台服务费额外发放
 		await this.createIntegration(serviceFeeTotal, order._id, 5, '', '', '');
-		const serviceFeeDTO: CreateServiceFeeDTO = {
-			totalFee: Number(serviceFeeTotal.toFixed(2)),
-			minusFee: Number((serviceFeeTotal - serviceFeeMinus).toFixed(2)),
-			bondToObjectId: order._id,
-			bondType: 1,
-		};
-		await this.serviceFeeService.create(serviceFeeDTO);
+		if (serviceFeeTotal > 0) {
+			const serviceFeeDTO: CreateServiceFeeDTO = {
+				totalFee: Number(serviceFeeTotal.toFixed(2)),
+				minusFee: Number((serviceFeeTotal - serviceFeeMinus).toFixed(2)),
+				bondToObjectId: order._id,
+				bondType: 1,
+			};
+			await this.serviceFeeService.create(serviceFeeDTO);
+		}
 	}
 
 	async testComplete(id) {
@@ -941,7 +944,7 @@ export class OrderService {
 			.exec();
 	}
 
-	// 根据id查找
+	// 修改价格
 	async changePrice(id: string, price: UpdatePriceDTO): Promise<IOrder | null> {
 		return await this.orderModel
 			.findByIdAndUpdate(id, { ...price, paySn: this.getOrderSn() })
@@ -949,7 +952,15 @@ export class OrderService {
 			.exec();
 	}
 
-	// 根据id查找
+	// 商家留言
+	async message(id: string, message: OrderMessageDTO): Promise<IOrder | null> {
+		return await this.orderModel
+			.findByIdAndUpdate(id, message)
+			.lean()
+			.exec();
+	}
+
+	// 修改地址
 	async changeAddress(
 		id: string,
 		address: CreateAddressDTO,

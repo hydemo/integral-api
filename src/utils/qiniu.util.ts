@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as qiniu from 'qiniu';
+import * as uuid from 'uuid/v4';
 import { RedisService } from 'nestjs-redis';
 import { ConfigService } from 'src/config/config.service';
+import { Base64 } from 'js-base64';
+import axios from 'axios';
 
 @Injectable()
 export class QiniuUtil {
@@ -60,5 +63,66 @@ export class QiniuUtil {
 		const client = this.redis.getClient();
 		await client.set('qiniu_upToken', uploadToken, 'EX', 60 * 60 * 1.5);
 		return uploadToken;
+	}
+
+	/**
+	 * 二进制上传
+	 *
+	 */
+	async uploadByStream(data: any, type: string): Promise<any> {
+		const config: any = new qiniu.conf.Config();
+		config.zone = qiniu.zone.Zone_z2;
+		const formUploader = new qiniu.form_up.FormUploader(config);
+		const putExtra = new qiniu.form_up.PutExtra();
+		const key = `${uuid()}.${type}`;
+		const uploadToken = await this.getUpToken();
+		return new Promise(resolve => {
+			formUploader.putStream(
+				uploadToken,
+				key,
+				data,
+				putExtra,
+				(respErr, respBody, respInfo) => {
+					if (respErr) {
+						console.log('upError:');
+						resolve('');
+					}
+					if (respInfo.statusCode === 200) {
+						return resolve(key);
+					} else {
+						console.log(respInfo.statusCode);
+						return resolve('');
+					}
+				},
+			);
+		});
+	}
+
+	/**
+	 * 上传base64文件到七牛云
+	 *
+	 * @param img 图片数据
+	 */
+	async uploadB64(img: string, type: string): Promise<string> {
+		console.log(img, 'ss');
+		const token = await this.getUpToken();
+		const key = Base64.encode(uuid() + '.' + type);
+		console.log(key, 'key');
+		const result: any = await axios({
+			method: 'post',
+			url: `http://up-z2.qiniup.com/putb64/-1/key/${key}`,
+			data: img,
+			headers: {
+				// tslint:disable-next-line:object-literal-key-quotes
+				Authorization: `UpToken ${token}`,
+				'Content-Type': 'application/octet-stream',
+			},
+		}).catch(e => {
+			console.log(e, 'e');
+		});
+		if (result.status === 200) {
+			return result.data.key;
+		}
+		return '';
 	}
 }

@@ -316,11 +316,38 @@ export class WeixinUtil {
 	}
 
 	/**
-	 * 获取微信access_token
+	 * 获取小程序access_token
 	 */
-	async access_token(): Promise<string> {
+	async xcx_token(): Promise<string> {
 		const client = this.redis.getClient();
-		const access_token = await client.get('weixin_accessToken');
+		const access_token = await client.get('xcx_accessToken');
+		if (access_token) {
+			return access_token;
+		}
+		const result = await axios({
+			method: 'get',
+			url: 'https://api.weixin.qq.com/cgi-bin/token',
+			params: {
+				grant_type: 'client_credential',
+				appid: this.config.appid,
+				secret: this.config.secret,
+			},
+		});
+		await client.set(
+			'xcx_accessToken',
+			result.data.access_token,
+			'EX',
+			60 * 60 * 1.5,
+		);
+		return result.data.access_token;
+	}
+
+	/**
+	 * 获取公众号access_token
+	 */
+	async gzh_token(): Promise<string> {
+		const client = this.redis.getClient();
+		const access_token = await client.get('gzh_accessToken');
 		if (access_token) {
 			return access_token;
 		}
@@ -334,7 +361,7 @@ export class WeixinUtil {
 			},
 		});
 		await client.set(
-			'weixin_accessToken',
+			'gzh_accessToken',
 			result.data.access_token,
 			'EX',
 			60 * 60 * 1.5,
@@ -362,7 +389,7 @@ export class WeixinUtil {
 
 	// 发送短信通知
 	async sendNoticeMessage(openId: string, data: ApplicationDTO) {
-		const token = await this.access_token();
+		const token = await this.gzh_token();
 		await axios({
 			method: 'post',
 			url: `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${token}`,
@@ -372,5 +399,20 @@ export class WeixinUtil {
 				data,
 			},
 		}).catch(e => {});
+	}
+
+	// 获取小程序码
+	async qrCode(scene: string, page: string) {
+		const token = await this.xcx_token();
+		const result: any = await axios({
+			method: 'post',
+			url: `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${token}`,
+			data: {
+				scene,
+				// page,
+			},
+			responseType: 'arraybuffer',
+		}).catch(e => {});
+		return result.data;
 	}
 }

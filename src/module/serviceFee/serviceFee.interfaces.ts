@@ -9,4 +9,6 @@ export interface IServiceFee extends Document {
 	readonly bondToObjectId: string;
 	// 关联类型
 	readonly bondType: number;
+	// 创建时间
+	createdAt: Date;
 }

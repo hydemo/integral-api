@@ -85,6 +85,7 @@ import { CMSAmbassadorCardController } from './controller/cms/ambassadorCard.con
 import { AmbassadorRateModule } from './module/ambassadorRate/ambassadorRate.module';
 import { CMSAmbassadorRateController } from './controller/cms/ambassadorRate.controller';
 import { ApiIntegrationController } from './controller/api/integration.controller';
+import { WeixinQrcodeModule } from './module/weixinQrcode/weixinQrcode.module';
 // import锚点
 
 @Module({
@@ -127,6 +128,7 @@ import { ApiIntegrationController } from './controller/api/integration.controlle
 		WithdrawModule,
 		AmbassadorCardModule,
 		AmbassadorRateModule,
+		WeixinQrcodeModule,
 		// module锚点
 		PassportModule.register({ defaultStrategy: 'jwt' }),
 		RedisModule.forRootAsync({

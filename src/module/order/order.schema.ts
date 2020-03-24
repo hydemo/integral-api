@@ -94,6 +94,8 @@ export const OrderSchema = new mongoose.Schema(
 		isRefund: { type: Boolean, default: false },
 		shipType: { type: Number, default: 2, enum: [1, 2] },
 		shop: { type: String },
+		// 商家留言
+		message: { type: String },
 	},
 	{ collection: 'order', versionKey: false, timestamps: true },
 );

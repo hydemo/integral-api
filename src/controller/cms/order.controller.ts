@@ -23,7 +23,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Pagination } from 'src/common/dto/pagination.dto';
 import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
-import { UpdatePriceDTO } from 'src/module/order/order.dto';
+import { UpdatePriceDTO, OrderMessageDTO } from 'src/module/order/order.dto';
 import { CreateShipperDTO } from 'src/module/shipper/shipper.dto';
 import { ShipperService } from 'src/module/shipper/shipper.service';
 import { CreateAddressDTO } from 'src/module/address/address.dto';
@@ -139,6 +139,20 @@ export class CMSOrderController {
 		@Request() req: any,
 	): Promise<any> {
 		return await this.orderService.changeAddress(id, address);
+	}
+
+	@Put('/:id/message')
+	@Roles(1)
+	@ApiOkResponse({
+		description: '商家留言',
+	})
+	@ApiOperation({ title: '商家留言', description: '商家留言' })
+	async message(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Body() message: OrderMessageDTO,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.orderService.message(id, message);
 	}
 
 	@Put('/:id/price')

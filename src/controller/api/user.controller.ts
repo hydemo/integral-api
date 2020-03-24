@@ -8,6 +8,7 @@ import {
 	Request,
 	Put,
 	Query,
+	Param,
 } from '@nestjs/common';
 import {
 	ApiUseTags,
@@ -32,10 +33,10 @@ import { ExchangeDTO } from 'src/module/integration/integration.dto';
 import { CreateWithdrawDTO } from 'src/module/withdraw/withdraw.dto';
 import { WithdrawService } from 'src/module/withdraw/withdraw.service';
 import { AmbassadorCardService } from 'src/module/ambassadorCard/ambassadorCard.service';
+import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
 
 @ApiUseTags('user')
 @ApiForbiddenResponse({ description: 'Unauthorized' })
-@UseGuards(AuthGuard())
 @Controller('users')
 export class ApiUserController {
 	constructor(
@@ -49,6 +50,7 @@ export class ApiUserController {
 	) {}
 
 	@Get('/balance')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '余额',
 	})
@@ -58,6 +60,7 @@ export class ApiUserController {
 	}
 
 	@Get('/address')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '获取积分地址',
 	})
@@ -67,6 +70,7 @@ export class ApiUserController {
 	}
 
 	@Get('/integration')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '用户积分',
 	})
@@ -76,6 +80,7 @@ export class ApiUserController {
 	}
 
 	@Post('/integration')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '赠送积分',
 	})
@@ -92,6 +97,7 @@ export class ApiUserController {
 	}
 
 	@Post('/integration/exchange')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '积分兑换',
 	})
@@ -119,6 +125,7 @@ export class ApiUserController {
 	// }
 
 	@Post('/ambassador')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '使用大使码',
 	})
@@ -134,6 +141,7 @@ export class ApiUserController {
 	}
 
 	@Post('/verify')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '实名认证',
 	})
@@ -143,6 +151,7 @@ export class ApiUserController {
 	}
 
 	@Put('/verify')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '修改实名认证',
 	})
@@ -155,6 +164,7 @@ export class ApiUserController {
 	}
 
 	@Get('/verify')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '获取实名认证详情',
 	})
@@ -183,6 +193,7 @@ export class ApiUserController {
 	}
 
 	@Get('/integrations/invite')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '推荐新人列表',
 	})
@@ -195,6 +206,7 @@ export class ApiUserController {
 	}
 
 	@Get('/integrations/share')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '分享商品',
 	})
@@ -207,6 +219,7 @@ export class ApiUserController {
 	}
 
 	@Get('/integrations/goods')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '上架推广商品',
 	})
@@ -219,6 +232,7 @@ export class ApiUserController {
 	}
 
 	@Get('/withdraws')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '提现申请列表',
 	})
@@ -231,6 +245,7 @@ export class ApiUserController {
 	}
 
 	@Post('/withdraws')
+	@UseGuards(AuthGuard())
 	@ApiOkResponse({
 		description: '提现申请列表',
 	})
@@ -240,5 +255,18 @@ export class ApiUserController {
 		@Request() req: any,
 	): Promise<any> {
 		return this.withdrawService.create(withdraw.amount, req.user);
+	}
+
+	@Get('/:id')
+	@ApiOkResponse({
+		description: '用户详情',
+	})
+	@ApiOperation({ title: '用户详情', description: '用户详情' })
+	async detail(@Param('id', new MongodIdPipe()) id: string): Promise<any> {
+		const user = await this.userService.findById(id);
+		if (!user) {
+			return null;
+		}
+		return { _id: user._id, nickname: user.nickname };
 	}
 }

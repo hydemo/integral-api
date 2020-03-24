@@ -71,7 +71,7 @@ export class IntegrationSummaryService {
 			return 0;
 		}
 		await this.integrationSummaryModel.findByIdAndUpdate(data._id, { amount });
-		return data.amount - amount;
+		return amount - data.amount;
 	}
 
 	// 根据条件查找单个数据

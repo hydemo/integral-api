@@ -244,7 +244,10 @@ export class IntegrationService {
 			count: 0,
 			type: changeAmount > 0 ? 'add' : 'minus',
 			sourceType: 8,
-			amount: Number(changeAmount.toFixed(2)),
+			amount:
+				changeAmount > 0
+					? Number(changeAmount.toFixed(2))
+					: -Number(changeAmount.toFixed(2)),
 		};
 		return await this.integrationModel.create(newIntegration);
 	}

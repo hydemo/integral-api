@@ -27,6 +27,8 @@ import { CategoryService } from 'src/module/category/category.service';
 import { CreateCollectDTO } from 'src/module/collect/collect.dto';
 import { CollectService } from 'src/module/collect/collect.service';
 import { JwtService } from '@nestjs/jwt';
+import { WeixinQrcodeService } from 'src/module/weixinQrcode/weixinQrcode.service';
+import { CreateWeixinQrcodeDTO } from 'src/module/weixinQrcode/weixinQrcode.dto';
 
 @ApiUseTags('good')
 @ApiForbiddenResponse({ description: 'Unauthorized' })
@@ -38,6 +40,8 @@ export class ApiGoodController {
 		@Inject(CategoryService) private categoryService: CategoryService,
 		@Inject(CollectService) private collectService: CollectService,
 		private readonly jwtService: JwtService,
+		@Inject(WeixinQrcodeService)
+		private weixinQrcodeService: WeixinQrcodeService,
 	) {}
 	@Get('/')
 	@ApiOkResponse({
@@ -195,5 +199,29 @@ export class ApiGoodController {
 			bondToObjectId: id,
 		};
 		return await this.collectService.removeByCondition(condition);
+	}
+
+	@Get('/:id/qrcode')
+	@UseGuards(AuthGuard())
+	@ApiOkResponse({
+		description: '获取商品分享二维码',
+	})
+	@ApiOperation({
+		title: '获取商品分享二维码',
+		description: '获取商品分享二维码',
+	})
+	async qrcode(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Query('page') page: string,
+		@Request() req: any,
+	): Promise<any> {
+		const weixinQrcode: CreateWeixinQrcodeDTO = {
+			user: String(req.user._id),
+			bondType: 1,
+			bondToObjectId: id,
+			page,
+		};
+		const url = await this.weixinQrcodeService.create(weixinQrcode);
+		return { url };
 	}
 }

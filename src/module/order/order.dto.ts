@@ -44,6 +44,13 @@ export class UpdatePriceDTO {
 	readonly actualPrice: number;
 }
 
+export class OrderMessageDTO {
+	@IsString()
+	@Type(() => String)
+	@ApiModelProperty({ description: '商家留言' })
+	readonly message: string;
+}
+
 export class CreateOrderByCartDTO {
 	@IsArray()
 	@ApiModelPropertyOptional({
