@@ -25,8 +25,8 @@ export class ScheduleService {
 	async enableSchedule() {
 		const logRule = new Schedule.RecurrenceRule();
 		logRule.second = 0;
-		logRule.minute = 2;
-		logRule.hour = 14;
+		logRule.minute = 0;
+		logRule.hour = 0;
 
 		const completeOrderRule = new Schedule.RecurrenceRule();
 		completeOrderRule.second = 30;
@@ -40,10 +40,10 @@ export class ScheduleService {
 
 		Schedule.scheduleJob(logRule, async () => {
 			if (process.env.NODE_APP_INSTANCE === '0') {
-				// await this.dataRecordService.genLog();
-				// await this.userRecordService.genLog();
-				// await this.categoryRecordService.genLog();
-				// await this.goodRecordService.genLog();
+				await this.dataRecordService.genLog();
+				await this.userRecordService.genLog();
+				await this.categoryRecordService.genLog();
+				await this.goodRecordService.genLog();
 				await this.integrationSummaryService.updatePool();
 			}
 		});

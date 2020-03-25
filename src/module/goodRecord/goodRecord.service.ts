@@ -102,6 +102,7 @@ export class GoodRecordService {
 					countTotal: preLog ? count + preLog.count : count,
 					good,
 				};
+
 				if (preLog) {
 					await this.goodRecordModel.findByIdAndUpdate(preLog._id, {
 						newRecord: false,

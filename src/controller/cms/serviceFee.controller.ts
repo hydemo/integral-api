@@ -77,15 +77,11 @@ export class CMSServiceFeeController {
 		stream
 			.on('end', () => {
 				fs.exists(path, exists => {
-					if (exists)
-						fs.unlink(path, err => {
-							console.log(err, 'err');
-						});
+					if (exists) fs.unlink(path, err => {});
 				});
 				return;
 			})
 			.on('error', err => {
-				console.log(err, 'err');
 				return;
 			});
 	}
