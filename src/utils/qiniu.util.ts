@@ -84,13 +84,11 @@ export class QiniuUtil {
 				putExtra,
 				(respErr, respBody, respInfo) => {
 					if (respErr) {
-						console.log('upError:');
 						resolve('');
 					}
 					if (respInfo.statusCode === 200) {
 						return resolve(key);
 					} else {
-						console.log(respInfo.statusCode);
 						return resolve('');
 					}
 				},
@@ -104,10 +102,8 @@ export class QiniuUtil {
 	 * @param img 图片数据
 	 */
 	async uploadB64(img: string, type: string): Promise<string> {
-		console.log(img, 'ss');
 		const token = await this.getUpToken();
 		const key = Base64.encode(uuid() + '.' + type);
-		console.log(key, 'key');
 		const result: any = await axios({
 			method: 'post',
 			url: `http://up-z2.qiniup.com/putb64/-1/key/${key}`,
@@ -117,9 +113,7 @@ export class QiniuUtil {
 				Authorization: `UpToken ${token}`,
 				'Content-Type': 'application/octet-stream',
 			},
-		}).catch(e => {
-			console.log(e, 'e');
-		});
+		}).catch(e => {});
 		if (result.status === 200) {
 			return result.data.key;
 		}

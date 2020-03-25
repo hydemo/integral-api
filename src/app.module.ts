@@ -86,6 +86,7 @@ import { AmbassadorRateModule } from './module/ambassadorRate/ambassadorRate.mod
 import { CMSAmbassadorRateController } from './controller/cms/ambassadorRate.controller';
 import { ApiIntegrationController } from './controller/api/integration.controller';
 import { WeixinQrcodeModule } from './module/weixinQrcode/weixinQrcode.module';
+import { ApiQrcodeController } from './controller/api/qrcode.controller';
 // import锚点
 
 @Module({
@@ -180,6 +181,7 @@ import { WeixinQrcodeModule } from './module/weixinQrcode/weixinQrcode.module';
 		CMSAmbassadorCardController,
 		CMSAmbassadorRateController,
 		ApiIntegrationController,
+		ApiQrcodeController,
 		// controller锚点
 	],
 })

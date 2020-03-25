@@ -8,8 +8,6 @@ import {
 	UseGuards,
 	Inject,
 	Request,
-	Put,
-	Response,
 	Delete,
 } from '@nestjs/common';
 import {

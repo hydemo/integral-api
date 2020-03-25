@@ -56,4 +56,9 @@ export class WeixinQrcodeService {
 			bondToObjectId,
 		});
 	}
+
+	// 根据id查找
+	async findById(id: string): Promise<IWeixinQrcode | null> {
+		return await this.weixinQrcodeModel.findById(id);
+	}
 }

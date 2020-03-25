@@ -409,7 +409,7 @@ export class WeixinUtil {
 			url: `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${token}`,
 			data: {
 				scene,
-				// page,
+				page,
 			},
 			responseType: 'arraybuffer',
 		}).catch(e => {});

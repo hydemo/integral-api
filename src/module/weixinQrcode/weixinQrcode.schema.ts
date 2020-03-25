@@ -13,7 +13,7 @@ export const WeixinQrcodeSchema = new mongoose.Schema(
 		// 二维码地址
 		url: { type: String },
 		// 链接路径
-		path: { type: String },
+		page: { type: String },
 	},
 	{ collection: 'weixinQrcode', versionKey: false, timestamps: true },
 );
