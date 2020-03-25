@@ -403,6 +403,7 @@ export class WeixinUtil {
 
 	// 获取小程序码
 	async qrCode(scene: string, page: string) {
+		console.log(scene, 'sss');
 		const token = await this.xcx_token();
 		const result: any = await axios({
 			method: 'post',
