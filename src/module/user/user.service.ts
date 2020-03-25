@@ -85,9 +85,12 @@ export class UserService {
 		if (!userInfo) {
 			throw new ApiException('登录失败', ApiErrorCode.LOGIN_ERROR, 406);
 		}
+		let inviteUser: any = null;
 		if (login.inviteBy) {
-			const inviteCheck = await this.userModel.findById(login.inviteBy);
-			if (!inviteCheck) {
+			inviteUser = await this.userModel
+				.findById(login.inviteBy)
+				.select({ _id: 1, nickname: 1, avatar: 1 });
+			if (!inviteUser) {
 				throw new ApiException('邀请人不存在', ApiErrorCode.NO_EXIST, 404);
 			}
 		}
@@ -111,6 +114,11 @@ export class UserService {
 				integrationAddress: 0,
 			})
 			.lean()
+			.populate({
+				path: 'inviteBy',
+				model: 'user',
+				select: '_id nickname avatar',
+			})
 			.exec();
 		if (!user) {
 			// 注册
@@ -125,6 +133,8 @@ export class UserService {
 				inviteBy: login.inviteBy,
 			});
 			const client = this.redis.getClient();
+			user.inviteBy = inviteUser;
+
 			await client.hincrby('dataRecord', 'users', 1);
 		}
 		// 更新登录信息

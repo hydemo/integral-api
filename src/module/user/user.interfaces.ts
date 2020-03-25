@@ -35,7 +35,7 @@ export interface IUser extends Document {
 	// vip过期时间
 	readonly vipExpire: Date;
 	// 邀请人
-	readonly inviteBy: string;
+	inviteBy: string;
 	// 是否实名认证
 	readonly isVerify: boolean;
 	// 推广大使级别
