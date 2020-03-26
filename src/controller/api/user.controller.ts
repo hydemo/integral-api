@@ -267,6 +267,6 @@ export class ApiUserController {
 		if (!user) {
 			return null;
 		}
-		return { _id: user._id, nickname: user.nickname };
+		return { _id: user._id, nickname: user.nickname, avatar: user.avatar };
 	}
 }

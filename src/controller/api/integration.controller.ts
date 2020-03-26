@@ -1,4 +1,4 @@
-import { UseGuards, Controller, Get, Request } from '@nestjs/common';
+import { Controller, Get, Request } from '@nestjs/common';
 import {
 	ApiUseTags,
 	ApiOkResponse,
@@ -7,14 +7,12 @@ import {
 	ApiBearerAuth,
 } from '@nestjs/swagger';
 import * as moment from 'moment';
-import { AuthGuard } from '@nestjs/passport';
 import { IntegrationSummaryService } from 'src/module/integrationSummary/integrationSummary.service';
 import { IntegrationRateService } from 'src/module/integrationRate/integrationRate.service';
 import { AmbassadorRateService } from 'src/module/ambassadorRate/ambassadorRate.service';
 @ApiUseTags('integration')
 @ApiBearerAuth()
 @ApiForbiddenResponse({ description: 'Unauthorized' })
-@UseGuards(AuthGuard())
 @Controller('/api/integrations')
 export class ApiIntegrationController {
 	constructor(
