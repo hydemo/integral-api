@@ -79,6 +79,30 @@ export class UserService {
 		return await this.userModel.findByIdAndUpdate(_id, user).exec();
 	}
 
+	// 修改邀请人
+	async updateInviteBy(id: string, inviteBy: string) {
+		if (!inviteBy) {
+			return await this.userModel.findByIdAndUpdate(id, {
+				$unset: { inviteBy: 1 },
+			});
+		}
+		const inviteUser = await this.userModel.findById(inviteBy);
+		if (!inviteUser) {
+			throw new ApiException('邀请人有误', ApiErrorCode.INPUT_ERROR, 404);
+		}
+		await this.userModel.findByIdAndUpdate(id, { inviteBy });
+	}
+
+	// 修改邀请人
+	async updateAmbassadorLevel(id: string, ambassadorLevel: number) {
+		if (!ambassadorLevel) {
+			return await this.userModel.findByIdAndUpdate(id, {
+				$unset: { ambassadorLevel: 1 },
+			});
+		}
+		await this.userModel.findByIdAndUpdate(id, { ambassadorLevel });
+	}
+
 	async loginByWeixin(login: LoginDTO, ip: string): Promise<any> {
 		// 解释用户数据
 		const userInfo = await this.weixinUtil.login(login.code, login);

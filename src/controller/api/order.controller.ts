@@ -116,6 +116,18 @@ export class ApiOrderController {
 		return await this.orderService.confirmOrder(id, order, req.user);
 	}
 
+	@Put('/:id')
+	@ApiOkResponse({
+		description: '确认订单',
+	})
+	@ApiOperation({ title: '确认订单', description: '确认订单' })
+	async complete(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.orderService.Complete(id, req.user._id);
+	}
+
 	@Get('/:id/shipFee')
 	@ApiOkResponse({
 		description: '获取物流费用',
@@ -175,6 +187,18 @@ export class ApiOrderController {
 		@Request() req: any,
 	): Promise<any> {
 		return await this.orderService.cancel(id, req.user._id);
+	}
+
+	@Put('/:id/pay')
+	@ApiOkResponse({
+		description: '支付订单',
+	})
+	@ApiOperation({ title: '支付订单', description: '支付订单' })
+	async pay(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Request() req: any,
+	): Promise<any> {
+		return await this.orderService.pay(id, req.user);
 	}
 
 	@Get('/:id/integration')

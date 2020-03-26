@@ -298,17 +298,22 @@ export class OrderService {
 		if (!newOrder) {
 			return;
 		}
-		// return await this.payOrder(newOrder, user._id);
-		await this.paySuccess(newOrder, '', 1);
-		await this.testComplete(newOrder._id);
+		return await this.payOrder(newOrder, user);
 	}
 
-	// 微信支付订单
-	async payOrder(order: IOrder | null, user: IUser) {
-		// const order: IOrder | null = await this.orderModel.findById(id).lean().exec()
+	async pay(id: string, user: IUser) {
+		const order: IOrder | null = await this.orderModel
+			.findById(id)
+			.lean()
+			.exec();
 		if (!order) {
 			throw new ApiException('订单不存在', ApiErrorCode.NO_EXIST, 406);
 		}
+		return await this.payOrder(order, user);
+	}
+
+	// 微信支付订单
+	async payOrder(order: IOrder, user: IUser) {
 		if (order.checkResult !== 1) {
 			throw new ApiException('订单有误', ApiErrorCode.NO_PERMISSION, 403);
 		}
@@ -776,7 +781,7 @@ export class OrderService {
 		}
 	}
 
-	async testComplete(id) {
+	async Complete(id: string, user: string) {
 		const completeOrder = await this.orderModel
 			.findById(id)
 			.populate({ path: 'products.product', model: 'product' })
@@ -784,6 +789,12 @@ export class OrderService {
 			.populate({ path: 'user', model: 'user' });
 		if (!completeOrder) {
 			return;
+		}
+		if (
+			completeOrder.checkResult < 2 &&
+			String(completeOrder.user._id) !== String(user)
+		) {
+			throw new ApiException('无权限', ApiErrorCode.NO_PERMISSION, 404);
 		}
 		await this.assignIntegration(completeOrder);
 	}

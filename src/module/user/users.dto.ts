@@ -6,9 +6,10 @@ import {
 	IsPositive,
 	IsMobilePhone,
 	Validate,
-	IsNotEmpty,
 	IsDefined,
 	MinLength,
+	IsMongoId,
+	IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CardNumberValidator, BankCardNoValidator } from './user.validator';
@@ -250,4 +251,18 @@ export class UpdateVerifyDTO {
 	@Type(() => String)
 	@ApiModelPropertyOptional({ description: '手机号' })
 	readonly phone: string;
+}
+
+export class InviteUserDTO {
+	@IsMongoId()
+	@Type(() => String)
+	@ApiModelProperty({ description: '邀请人' })
+	readonly inviteBy: string;
+}
+
+export class AmbassadorLevelDTO {
+	@IsInt()
+	@Type(() => Number)
+	@ApiModelProperty({ description: '推广大使等级' })
+	readonly ambassadorLevel: number;
 }

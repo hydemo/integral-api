@@ -334,6 +334,12 @@ export class GoodService {
 			.findById(id)
 			.lean()
 			.exec();
+		if (!good.onSale) {
+			throw new ApiException('商品已下架', ApiErrorCode.NO_EXIST, 404);
+		}
+		if (!good.isDelete) {
+			throw new ApiException('商品不存在', ApiErrorCode.NO_EXIST, 404);
+		}
 		const goodSpecifications: IGoodSpecification[] = await this.goodSpecificationService.all(
 			{ good: id },
 		);

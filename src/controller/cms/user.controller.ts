@@ -26,6 +26,7 @@ import { Pagination } from 'src/common/dto/pagination.dto';
 import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
 import { UserBalanceService } from 'src/module/userBalance/userBalance.service';
 import { UserBalanceDTO } from 'src/module/userBalance/userBalance.dto';
+import { AmbassadorLevelDTO, InviteUserDTO } from 'src/module/user/users.dto';
 
 @ApiUseTags('cms/user')
 @ApiForbiddenResponse({ description: 'Unauthorized' })
@@ -85,6 +86,35 @@ export class CMSUserController {
 		@Request() req: any,
 	): Promise<any> {
 		return await this.userBalanceService.update(id, balance);
+	}
+
+	@Put('/:id/invite')
+	@ApiOkResponse({
+		description: '修改邀请人',
+	})
+	@Roles(0)
+	@ApiOperation({ title: '修改邀请人', description: '修改邀请人' })
+	async invite(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Body() invite: InviteUserDTO,
+	): Promise<any> {
+		return await this.userService.updateInviteBy(id, invite.inviteBy);
+	}
+
+	@Put('/:id/ambassadorLevel')
+	@ApiOkResponse({
+		description: '修改推广大使等级',
+	})
+	@Roles(0)
+	@ApiOperation({ title: '修改推广大使等级', description: '修改推广大使等级' })
+	async ambassadorLevel(
+		@Param('id', new MongodIdPipe()) id: string,
+		@Body() ambassadorLevel: AmbassadorLevelDTO,
+	): Promise<any> {
+		return await this.userService.updateAmbassadorLevel(
+			id,
+			ambassadorLevel.ambassadorLevel,
+		);
 	}
 
 	@Get('/:id/verify')

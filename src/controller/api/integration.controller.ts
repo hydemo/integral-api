@@ -36,7 +36,12 @@ export class ApiIntegrationController {
 		} = await this.integrationSummaryService.findOneByDate(
 			moment().format('YYYY-MM-DD'),
 		);
-		return { price: integrationPrice };
+		const {
+			integrationPrice: priceOfYestoday,
+		} = await this.integrationSummaryService.findOneByDate(
+			moment(-1, 'd').format('YYYY-MM-DD'),
+		);
+		return { price: integrationPrice, priceOfYestoday };
 	}
 
 	@Get('/rate')
