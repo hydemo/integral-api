@@ -198,7 +198,6 @@ export class IntegrationService {
 		if (count > user.integration) {
 			throw new ApiException('积分不足', ApiErrorCode.INPUT_ERROR, 406);
 		}
-
 		const {
 			integrationPrice,
 		} = await this.integrationSummaryService.findOneByDate(
