@@ -48,10 +48,10 @@ export class CreateProductDTO {
 	@ApiModelProperty({ description: '库存' })
 	readonly stock: number;
 
-	@IsString()
-	@Type(() => String)
-	@ApiModelProperty({ description: '显示销量' })
-	readonly sellVolumnToShow: string;
+	@IsNumber()
+	@Type(() => Number)
+	@ApiModelProperty({ description: '销量基数' })
+	readonly sellVolumnToShow: number;
 
 	@IsNumber()
 	@Type(() => Number)

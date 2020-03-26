@@ -63,7 +63,7 @@ export const GoodSchema = new mongoose.Schema(
 		// 上架推广人
 		recommendUser: { type: ObjectId },
 		// 显示销量
-		sellVolumnToShow: { type: String },
+		sellVolumnToShow: { type: Number, default: 0 },
 	},
 	{ collection: 'good', versionKey: false, timestamps: true },
 );

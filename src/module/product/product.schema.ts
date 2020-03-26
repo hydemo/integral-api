@@ -31,7 +31,7 @@ export const ProductSchema = new mongoose.Schema(
 		// 销量
 		sellVolumn: { type: Number, default: 0 },
 		// 销量
-		sellVolumnToShow: { type: String },
+		sellVolumnToShow: { type: Number, default: 0 },
 		// 服务费
 		serviceFee: { type: Number },
 	},
