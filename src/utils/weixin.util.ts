@@ -111,8 +111,8 @@ export class WeixinUtil {
 				{
 					body: '购买商品',
 					out_trade_no: String(payInfo.orderId),
-					total_fee: Number((payInfo.fee * 100).toFixed(0)),
-					// total_fee: 1,
+					// total_fee: Number((payInfo.fee * 100).toFixed(0)),
+					total_fee: 1,
 					spbill_create_ip: this.config.spbillCreatIp,
 					notify_url: this.config.notifyUrl,
 					trade_type,
