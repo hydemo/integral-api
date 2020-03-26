@@ -125,7 +125,7 @@ export class ApiOrderController {
 		@Param('id', new MongodIdPipe()) id: string,
 		@Request() req: any,
 	): Promise<any> {
-		return await this.orderService.Complete(id, req.user._id);
+		return await this.orderService.complete(id, req.user._id);
 	}
 
 	@Get('/:id/shipFee')

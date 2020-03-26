@@ -298,7 +298,9 @@ export class OrderService {
 		if (!newOrder) {
 			return;
 		}
-		return await this.payOrder(newOrder, user);
+		await this.paySuccess(newOrder, '', 1);
+		await this.complete(newOrder._id, user._id);
+		// return await this.payOrder(newOrder, user);
 	}
 
 	async pay(id: string, user: IUser) {
@@ -781,7 +783,7 @@ export class OrderService {
 		}
 	}
 
-	async Complete(id: string, user: string) {
+	async complete(id: string, user: string) {
 		const completeOrder = await this.orderModel
 			.findById(id)
 			.populate({ path: 'products.product', model: 'product' })
