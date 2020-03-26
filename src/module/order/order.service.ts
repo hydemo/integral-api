@@ -796,6 +796,10 @@ export class OrderService {
 		) {
 			throw new ApiException('无权限', ApiErrorCode.NO_PERMISSION, 404);
 		}
+		await this.orderModel.findByIdAndUpdate(completeOrder._id, {
+			checkResult: 5,
+			completeTime: Date.now(),
+		});
 		await this.assignIntegration(completeOrder);
 	}
 
