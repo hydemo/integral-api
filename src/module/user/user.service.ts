@@ -212,12 +212,18 @@ export class UserService {
 			return {};
 		}
 		return {
-			realName: this.cryptoUtil.aesDecrypt(user.realName),
-			phone: this.cryptoUtil.aesDecrypt(user.realName),
-			cardNumber: this.cryptoUtil.aesDecrypt(user.cardNumber),
+			nickname: user.nickname,
+			avatar: user.avatar,
+			realName: user.realName ? this.cryptoUtil.aesDecrypt(user.realName) : '',
+			phone: user.phone ? this.cryptoUtil.aesDecrypt(user.phone) : '',
+			cardNumber: user.cardNumber
+				? this.cryptoUtil.aesDecrypt(user.cardNumber)
+				: '',
 			bank: user.bank,
 			bankAddress: user.bankAddress,
-			bankNumber: this.cryptoUtil.aesDecrypt(user.bankNumber),
+			bankNumber: user.bankNumber
+				? this.cryptoUtil.aesDecrypt(user.bankNumber)
+				: '',
 		};
 	}
 
