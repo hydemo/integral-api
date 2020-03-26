@@ -24,7 +24,7 @@ export class WithdrawService {
 	// 创建数据
 	async create(amount: number, user: IUser): Promise<string> {
 		if (!user.isVerify) {
-			throw new ApiException('请先实名认证', ApiErrorCode.INPUT_ERROR, 406);
+			throw new ApiException('请先完善资料', ApiErrorCode.INPUT_ERROR, 406);
 		}
 		if (user.balance < 100 || amount > user.balance) {
 			throw new ApiException('余额不足', ApiErrorCode.INPUT_ERROR, 406);

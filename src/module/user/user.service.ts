@@ -290,7 +290,7 @@ export class UserService {
 	// 更改实名认证
 	async updateVerify(verify: UpdateVerifyDTO, user: IUser) {
 		if (!user.isVerify) {
-			throw new ApiException('还未实名认证', ApiErrorCode.NO_PERMISSION, 403);
+			throw new ApiException('请先完善资料', ApiErrorCode.NO_PERMISSION, 403);
 		}
 		const update: any = { ...verify };
 		if (verify.phone) {
