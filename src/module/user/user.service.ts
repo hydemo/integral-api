@@ -86,6 +86,9 @@ export class UserService {
 
 	// 修改邀请人
 	async updateInviteBy(id: string, inviteBy: string) {
+		if (String(id) === String(inviteBy)) {
+			throw new ApiException('无权限', ApiErrorCode.NO_PERMISSION, 403);
+		}
 		if (!inviteBy) {
 			return await this.userModel.findByIdAndUpdate(id, {
 				$unset: { inviteBy: 1 },
