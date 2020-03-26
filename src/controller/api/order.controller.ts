@@ -116,11 +116,11 @@ export class ApiOrderController {
 		return await this.orderService.confirmOrder(id, order, req.user);
 	}
 
-	@Put('/:id')
+	@Put('/:id/complete')
 	@ApiOkResponse({
-		description: '确认订单',
+		description: '完成订单',
 	})
-	@ApiOperation({ title: '确认订单', description: '确认订单' })
+	@ApiOperation({ title: '完成订单', description: '完成订单' })
 	async complete(
 		@Param('id', new MongodIdPipe()) id: string,
 		@Request() req: any,

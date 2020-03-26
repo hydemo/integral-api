@@ -1,4 +1,5 @@
 import { Model } from 'mongoose';
+import * as moment from 'moment';
 import { Inject, Injectable } from '@nestjs/common';
 import { ApiErrorCode } from '@common/enum/api-error-code.enum';
 import { ApiException } from '@common/expection/api.exception';
@@ -78,6 +79,21 @@ export class WithdrawService {
 			.lean();
 		const total = await this.withdrawModel.countDocuments(condition);
 		return { list, total };
+	}
+
+	// 当日提现信息
+	async withdrawInfo(user: string) {
+		const condition = {
+			createdAt: { $gte: moment().startOf('d') },
+			checkResult: { $ne: 3 },
+			user,
+		};
+		const list = await this.withdrawModel.find(condition).lean();
+		let amount = 0;
+		list.map(li => {
+			amount += li.amount;
+		});
+		return { amount: amount.toFixed(2), count: list.length };
 	}
 
 	// 提现成功

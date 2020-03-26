@@ -244,6 +244,16 @@ export class ApiUserController {
 		return this.withdrawService.listByUser(pagination, req.user._id);
 	}
 
+	@Get('/withdraws/info')
+	@UseGuards(AuthGuard())
+	@ApiOkResponse({
+		description: '今日提现信息',
+	})
+	@ApiOperation({ title: '今日提现信息', description: '今日提现信息' })
+	async withdrawInfo(@Request() req: any): Promise<any> {
+		return this.withdrawService.withdrawInfo(req.user._id);
+	}
+
 	@Post('/withdraws')
 	@UseGuards(AuthGuard())
 	@ApiOkResponse({
