@@ -62,6 +62,11 @@ export class CreateGoodDTO {
 	@ApiModelPropertyOptional({ description: '是否热销' })
 	readonly isHot: boolean;
 
+	@IsString()
+	@Type(() => String)
+	@ApiModelProperty({ description: '显示销量' })
+	readonly sellVolumnToShow: string;
+
 	@IsBoolean()
 	@Type(() => Boolean)
 	@ApiModelPropertyOptional({ description: '是否限时销售' })

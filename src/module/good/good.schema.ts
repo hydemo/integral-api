@@ -62,6 +62,8 @@ export const GoodSchema = new mongoose.Schema(
 		checkResult: { type: Number, enum: [1, 2, 3], default: 2 },
 		// 上架推广人
 		recommendUser: { type: ObjectId },
+		// 显示销量
+		sellVolumnToShow: { type: String },
 	},
 	{ collection: 'good', versionKey: false, timestamps: true },
 );

@@ -30,6 +30,8 @@ export const ProductSchema = new mongoose.Schema(
 		deleteTime: Date,
 		// 销量
 		sellVolumn: { type: Number, default: 0 },
+		// 销量
+		sellVolumnToShow: { type: String },
 		// 服务费
 		serviceFee: { type: Number },
 	},
