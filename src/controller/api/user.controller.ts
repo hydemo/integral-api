@@ -90,7 +90,7 @@ export class ApiUserController {
 		@Request() req: any,
 	): Promise<any> {
 		return await this.integrationService.giveIntegration(
-			req.user._id,
+			req.user,
 			integration.address,
 			integration.count,
 		);
@@ -106,10 +106,7 @@ export class ApiUserController {
 		@Body() integration: ExchangeDTO,
 		@Request() req: any,
 	): Promise<any> {
-		return await this.integrationService.exchange(
-			req.user._id,
-			integration.count,
-		);
+		return await this.integrationService.exchange(req.user, integration.count);
 	}
 
 	// @Post('/vipCard')

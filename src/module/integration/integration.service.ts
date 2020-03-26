@@ -194,7 +194,6 @@ export class IntegrationService {
 		if (!count || count < 0) {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
 		}
-		console.log(count, user, typeof count, 'sss');
 		if (count > user.integration) {
 			throw new ApiException('积分不足', ApiErrorCode.INPUT_ERROR, 406);
 		}

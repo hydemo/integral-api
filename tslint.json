@@ -17,7 +17,7 @@
 		"interface-name": [false],
 		"array-type": [false],
 		"no-empty-interface": false,
-		"no-console": false,
+		"no-console": true,
 		"no-empty": false,
 		"prefer-for-of": false,
 		"arrow-parens": false,
