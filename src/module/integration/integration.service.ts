@@ -123,9 +123,12 @@ export class IntegrationService {
 	}
 
 	// 赠送积分
-	async giveIntegration(user: string, address: string, integration: number) {
+	async giveIntegration(user: IUser, address: string, integration: number) {
 		if (integration < 0) {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
+		}
+		if (user.integration < integration) {
+			throw new ApiException('积分不足', ApiErrorCode.INPUT_ERROR, 406);
 		}
 		const addressUser = await this.userService.findByIntegrationAddress(
 			address,
@@ -160,7 +163,7 @@ export class IntegrationService {
 		}
 
 		const giveIntegration: CreateIntegrationDTO = {
-			user,
+			user: user._id,
 			count: Number(integration.toFixed(3)),
 			type: 'minus',
 			sourceType: 9,
@@ -170,7 +173,7 @@ export class IntegrationService {
 			giveIntegration.sourceId = sourceId;
 		}
 		await this.integrationModel.create(giveIntegration);
-		await this.userService.incIntegration(user, -integration);
+		await this.userService.incIntegration(user._id, -integration);
 
 		const getIntegration: CreateIntegrationDTO = {
 			user: addressUser._id,
@@ -191,6 +194,7 @@ export class IntegrationService {
 		if (!count || count < 0) {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
 		}
+		console.log(count, user, typeof count, 'sss');
 		if (count > user.integration) {
 			throw new ApiException('积分不足', ApiErrorCode.INPUT_ERROR, 406);
 		}
