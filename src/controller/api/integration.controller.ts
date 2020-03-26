@@ -10,15 +10,19 @@ import * as moment from 'moment';
 import { IntegrationSummaryService } from 'src/module/integrationSummary/integrationSummary.service';
 import { IntegrationRateService } from 'src/module/integrationRate/integrationRate.service';
 import { AmbassadorRateService } from 'src/module/ambassadorRate/ambassadorRate.service';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/module/user/user.service';
 @ApiUseTags('integration')
 @ApiBearerAuth()
 @ApiForbiddenResponse({ description: 'Unauthorized' })
 @Controller('/api/integrations')
 export class ApiIntegrationController {
 	constructor(
-		private integrationSummaryService: IntegrationSummaryService,
-		private integrationRateService: IntegrationRateService,
-		private ambassadorRateService: AmbassadorRateService,
+		private readonly integrationSummaryService: IntegrationSummaryService,
+		private readonly integrationRateService: IntegrationRateService,
+		private readonly ambassadorRateService: AmbassadorRateService,
+		private readonly jwtService: JwtService,
+		private readonly userService: UserService,
 	) {}
 
 	@Get('/price')
@@ -44,11 +48,21 @@ export class ApiIntegrationController {
 		const integrationRate = await this.integrationRateService.getRate();
 		const buyRate = integrationRate[1];
 		let shareRate = integrationRate[3];
-		if (req.user.ambassadorLevel) {
-			const ambassadorRate = await this.ambassadorRateService.getRate(
-				req.user.ambassadorLevel,
-			);
-			shareRate = ambassadorRate[3];
+		const headers = req.headers;
+		if (headers.authorization) {
+			const token = headers.authorization.replace('Bearer', '').trim();
+			if (token) {
+				const payload = this.jwtService.verify(token);
+				if (payload.type === 'user') {
+					const user = await this.userService.findById(payload.id);
+					if (user) {
+						const ambassadorRate = await this.ambassadorRateService.getRate(
+							user.ambassadorLevel,
+						);
+						shareRate = ambassadorRate[3];
+					}
+				}
+			}
 		}
 		return { buyRate, shareRate };
 	}
