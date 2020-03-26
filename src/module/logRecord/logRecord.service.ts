@@ -198,6 +198,12 @@ export class LogService {
 				case 'balance':
 					type = '修改前台用户余额';
 					break;
+				case 'invite':
+					type = '修改前台邀请人';
+					break;
+				case 'balance':
+					type = '修改前台推广大使等级';
+					break;
 				default:
 					break;
 			}
