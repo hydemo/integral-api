@@ -59,6 +59,11 @@ export class UserService {
 			.limit(pagination.pageSize)
 			.skip((pagination.current - 1) * pagination.pageSize)
 			.sort({ createdAt: -1 })
+			.populate({
+				path: 'inviteBy',
+				model: 'user',
+				select: '_id nickname',
+			})
 			.lean()
 			.then(users => {
 				return users.map(item => {
