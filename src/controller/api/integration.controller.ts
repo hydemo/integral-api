@@ -55,7 +55,7 @@ export class ApiIntegrationController {
 				const payload = this.jwtService.verify(token);
 				if (payload.type === 'user') {
 					const user = await this.userService.findById(payload.id);
-					if (user) {
+					if (user && user.ambassadorLevel) {
 						const ambassadorRate = await this.ambassadorRateService.getRate(
 							user.ambassadorLevel,
 						);

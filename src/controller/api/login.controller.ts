@@ -8,7 +8,6 @@ import {
 } from '@nestjs/swagger';
 import { LoginDTO } from 'src/module/user/login.dto';
 import { UserService } from 'src/module/user/user.service';
-import { IntegrationService } from 'src/module/integration/integration.service';
 
 // UseGuards()傳入@nest/passport下的AuthGuard
 @ApiUseTags('login')

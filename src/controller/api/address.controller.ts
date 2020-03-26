@@ -9,7 +9,6 @@ import {
 	Inject,
 	Request,
 	Put,
-	Response,
 	Delete,
 } from '@nestjs/common';
 import {
@@ -21,7 +20,6 @@ import {
 import { CreateAddressDTO } from 'src/module/address/address.dto';
 import { AddressService } from 'src/module/address/address.service';
 import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Pagination } from 'src/common/dto/pagination.dto';
 import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
 
