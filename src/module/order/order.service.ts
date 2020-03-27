@@ -298,9 +298,10 @@ export class OrderService {
 		if (!newOrder) {
 			return;
 		}
-		await this.paySuccess(newOrder, '', 1);
-		await this.complete(newOrder._id, user._id);
-		// return await this.payOrder(newOrder, user);
+		// await this.paySuccess(newOrder, '', 1);
+		// await this.complete(newOrder._id, user._id);
+		await this.payOrder(newOrder, user);
+		return;
 	}
 
 	async pay(id: string, user: IUser) {
