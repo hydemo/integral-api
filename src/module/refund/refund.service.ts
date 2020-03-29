@@ -473,8 +473,6 @@ export class RefundService {
 		} else {
 			const result: any = await this.weixinUtil.refund(
 				refund.refundPrice,
-				order.actualPrice,
-				order.user.weixinOpenid,
 				order.paySn,
 				refund._id,
 			);

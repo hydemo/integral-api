@@ -133,6 +133,13 @@ export class IntegrationService {
 		const addressUser = await this.userService.findByIntegrationAddress(
 			address,
 		);
+		if (String(addressUser._id) === String(user._id)) {
+			throw new ApiException(
+				'请勿给自己赠送积分',
+				ApiErrorCode.INPUT_ERROR,
+				406,
+			);
+		}
 		const integrationRate = await this.integrationRateService.getRate();
 		const {
 			integrationPrice,

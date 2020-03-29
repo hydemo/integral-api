@@ -36,11 +36,16 @@ export class ApiIntegrationController {
 		} = await this.integrationSummaryService.findOneByDate(
 			moment().format('YYYY-MM-DD'),
 		);
+		const now = moment().format('HH:mm:ss');
+		let minus = -1;
+		if (now < '20:00:00') {
+			minus = -2;
+		}
 		const {
 			integrationPrice: priceOfYestoday,
 		} = await this.integrationSummaryService.findOneByDate(
 			moment()
-				.add(-1, 'd')
+				.add(minus, 'd')
 				.format('YYYY-MM-DD'),
 		);
 		return { price: integrationPrice, priceOfYestoday };
