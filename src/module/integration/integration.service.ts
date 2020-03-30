@@ -97,11 +97,10 @@ export class IntegrationService {
 		user: string,
 	): Promise<IList<IIntegration>> {
 		const condition = this.paginationUtil.genCondition(pagination, []);
+		condition.user = user;
 		if (sourceType === 2) {
-			condition.user = user;
 			condition.sourceType = sourceType;
 		} else if (sourceType === 3 || sourceType === 4) {
-			condition.user = user;
 			condition.sourceType = sourceType;
 		} else {
 			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
@@ -115,6 +114,10 @@ export class IntegrationService {
 				path: 'sourceUser',
 				model: 'user',
 				select: '_id nickname',
+			})
+			.populate({
+				path: 'good',
+				model: 'good',
 			})
 			.lean()
 			.exec();
