@@ -573,7 +573,7 @@ export class OrderService {
 	}
 
 	// 取消订单
-	async cancel(id: string, user: string): Promise<IOrder | null> {
+	async cancel(id: string, user: string) {
 		const order: IOrder | null = await this.orderModel
 			.findById(id)
 			.lean()
@@ -587,13 +587,6 @@ export class OrderService {
 		if (order.checkResult !== 5 && order.checkResult !== 1) {
 			throw new ApiException('订单有误', ApiErrorCode.NO_PERMISSION, 403);
 		}
-		if (order.checkResult === 5) {
-			await this.orderModel.findByIdAndUpdate(id, {
-				isDelete: true,
-				deleteTime: Date.now(),
-			});
-			return null;
-		}
 		if (order.checkResult === 1) {
 			await Promise.all(
 				order.products.map(async product => {
@@ -601,19 +594,14 @@ export class OrderService {
 				}),
 			);
 			await this.orderModel.findByIdAndDelete(id);
+			return null;
 		}
-
-		if (order.integration && order.integration > 0) {
-			const balance: CreateUserBalanceDTO = {
-				amount: order.integrationAmount,
-				user: order.user,
-				type: 'add',
-				sourceId: order._id,
-				sourceType: 1,
-			};
-			await this.userBalanceService.create(balance);
+		if (order.checkResult === 5) {
+			await this.orderModel.findByIdAndUpdate(id, {
+				isDelete: true,
+				deleteTime: Date.now(),
+			});
 		}
-		return null;
 	}
 
 	async clearOrder() {
