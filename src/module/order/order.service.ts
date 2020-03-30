@@ -605,7 +605,7 @@ export class OrderService {
 
 		if (order.integration && order.integration > 0) {
 			const balance: CreateUserBalanceDTO = {
-				amount: order.actualPrice,
+				amount: order.integrationAmount,
 				user: order.user,
 				type: 'add',
 				sourceId: order._id,
