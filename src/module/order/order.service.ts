@@ -584,8 +584,15 @@ export class OrderService {
 		if (String(order.user) !== String(user)) {
 			throw new ApiException('无权限', ApiErrorCode.NO_PERMISSION, 403);
 		}
-		if (order.checkResult !== 4 && order.checkResult === 1) {
+		if (order.checkResult !== 5 && order.checkResult !== 1) {
 			throw new ApiException('订单有误', ApiErrorCode.NO_PERMISSION, 403);
+		}
+		if (order.checkResult === 5) {
+			await this.orderModel.findByIdAndUpdate(id, {
+				isDelete: true,
+				deleteTime: Date.now(),
+			});
+			return null;
 		}
 		if (order.checkResult === 1) {
 			await Promise.all(
@@ -595,12 +602,7 @@ export class OrderService {
 			);
 			await this.orderModel.findByIdAndDelete(id);
 		}
-		if (order.checkResult === 4) {
-			await this.orderModel.findByIdAndUpdate(id, {
-				isDelete: true,
-				deleteTime: Date.now(),
-			});
-		}
+
 		if (order.integration && order.integration > 0) {
 			const balance: CreateUserBalanceDTO = {
 				amount: order.actualPrice,
