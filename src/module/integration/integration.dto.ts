@@ -60,6 +60,12 @@ export class CreateIntegrationDTO {
 	@ApiModelProperty({ description: '商品id' })
 	good?: string;
 
+	// 关联商品数量
+	@IsNumber()
+	@Type(() => Number)
+	@ApiModelProperty({ description: '承兑金额' })
+	goodCount?: number;
+
 	@IsMongoId()
 	@Type(() => String)
 	@ApiModelProperty({ description: '购买人' })

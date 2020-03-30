@@ -22,6 +22,8 @@ export const IntegrationSchema = new mongoose.Schema(
 		amount: { type: Number },
 		// 关联商品
 		good: { type: ObjectId },
+		// 关联商品数量
+		goodCount: { type: Number },
 		// 购买人
 		sourceUser: { type: ObjectId },
 		// 是否vip

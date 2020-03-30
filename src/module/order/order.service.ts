@@ -655,6 +655,7 @@ export class OrderService {
 		sourceType: number,
 		user: string,
 		good: string,
+		goodCount: number,
 		sourceUser: string,
 	): Promise<number> {
 		const {
@@ -718,6 +719,9 @@ export class OrderService {
 		if (good) {
 			integration.good = good;
 		}
+		if (goodCount) {
+			integration.goodCount = goodCount;
+		}
 		if (sourceUser) {
 			integration.sourceUser = sourceUser;
 		}
@@ -746,6 +750,7 @@ export class OrderService {
 						3,
 						product.recommendUser,
 						product.good._id,
+						product.count,
 						order.user._id,
 					);
 				}
@@ -757,6 +762,7 @@ export class OrderService {
 						4,
 						product.good.recommendUser,
 						product.good._id,
+						product.count,
 						order.user._id,
 					);
 				}
@@ -769,6 +775,7 @@ export class OrderService {
 			1,
 			order.user._id,
 			'',
+			0,
 			order.user._id,
 		);
 		// 推荐人积分发放
@@ -779,11 +786,12 @@ export class OrderService {
 				2,
 				order.user.inviteBy,
 				'',
+				0,
 				order.user._id,
 			);
 		}
 		// 平台服务费额外发放
-		await this.createIntegration(serviceFeeTotal, order._id, 5, '', '', '');
+		await this.createIntegration(serviceFeeTotal, order._id, 5, '', '', 0, '');
 		if (serviceFeeTotal > 0) {
 			const serviceFeeDTO: CreateServiceFeeDTO = {
 				totalFee: Number(serviceFeeTotal.toFixed(2)),
