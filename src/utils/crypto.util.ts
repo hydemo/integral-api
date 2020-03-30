@@ -142,7 +142,7 @@ export class CryptoUtil {
 		}
 		return `${str.slice(0, 3)}${'*'.repeat(length - 7)}${str.slice(
 			length - 4,
-			length - 1,
+			length,
 		)}`;
 	}
 }
