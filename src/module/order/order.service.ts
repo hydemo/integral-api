@@ -750,7 +750,7 @@ export class OrderService {
 						3,
 						product.recommendUser,
 						product.good._id,
-						product.count,
+						product.count - product.refundCount,
 						order.user._id,
 					);
 				}
@@ -762,7 +762,7 @@ export class OrderService {
 						4,
 						product.good.recommendUser,
 						product.good._id,
-						product.count,
+						product.count - product.refundCount,
 						order.user._id,
 					);
 				}
