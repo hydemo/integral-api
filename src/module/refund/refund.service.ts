@@ -121,7 +121,11 @@ export class RefundService {
 
 	// 统计数量
 	async count(user) {
-		return await this.refundModel.countDocuments({ isDelete: false, user });
+		return await this.refundModel.countDocuments({
+			isDelete: false,
+			user,
+			checkResult: 1,
+		});
 	}
 	// 确认退款
 	async confirm(id: string, address: CreateAddressDTO) {
