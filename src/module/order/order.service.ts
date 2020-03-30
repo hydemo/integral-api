@@ -291,6 +291,15 @@ export class OrderService {
 				update.actualPrice > integrationAmount
 					? Number((update.actualPrice - integrationAmount).toFixed(2))
 					: 0;
+			const newIntegration: CreateIntegrationDTO = {
+				user: order.user,
+				count: update.integration,
+				type: 'minus',
+				sourceType: 1,
+				sourceId: order._id,
+				amount: update.integrationAmount,
+			};
+			await this.integrationService.create(newIntegration);
 		}
 		const newOrder = await this.orderModel.findByIdAndUpdate(id, update, {
 			new: true,
@@ -573,7 +582,7 @@ export class OrderService {
 	}
 
 	// 取消订单
-	async cancel(id: string, user: string) {
+	async cancel(id: string, user: string): Promise<IOrder | null> {
 		const order: IOrder | null = await this.orderModel
 			.findById(id)
 			.lean()
@@ -587,6 +596,13 @@ export class OrderService {
 		if (order.checkResult !== 5 && order.checkResult !== 1) {
 			throw new ApiException('订单有误', ApiErrorCode.NO_PERMISSION, 403);
 		}
+		if (order.checkResult === 5) {
+			await this.orderModel.findByIdAndUpdate(id, {
+				isDelete: true,
+				deleteTime: Date.now(),
+			});
+			return null;
+		}
 		if (order.checkResult === 1) {
 			await Promise.all(
 				order.products.map(async product => {
@@ -594,14 +610,19 @@ export class OrderService {
 				}),
 			);
 			await this.orderModel.findByIdAndDelete(id);
-			return null;
 		}
-		if (order.checkResult === 5) {
-			await this.orderModel.findByIdAndUpdate(id, {
-				isDelete: true,
-				deleteTime: Date.now(),
-			});
+
+		if (order.integration && order.integration > 0) {
+			const balance: CreateUserBalanceDTO = {
+				amount: order.integrationAmount,
+				user: order.user,
+				type: 'add',
+				sourceId: order._id,
+				sourceType: 1,
+			};
+			await this.userBalanceService.create(balance);
 		}
+		return null;
 	}
 
 	async clearOrder() {
@@ -1057,17 +1078,6 @@ export class OrderService {
 			.lean()
 			.exec();
 		await this.sendNotice(order, payTime);
-		if (order.integration) {
-			const newIntegration: CreateIntegrationDTO = {
-				user: order.user,
-				count: order.integration,
-				type: 'minus',
-				sourceType: 1,
-				sourceId: order._id,
-				amount: order.integrationAmount,
-			};
-			await this.integrationService.create(newIntegration);
-		}
 		return order;
 	}
 
