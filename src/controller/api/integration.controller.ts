@@ -41,13 +41,15 @@ export class ApiIntegrationController {
 		if (now < '20:00:00') {
 			minus = -2;
 		}
-		const {
-			integrationPrice: priceOfYestoday,
-		} = await this.integrationSummaryService.findOneByDate(
+		let priceOfYestoday = 0.01;
+		const yestoday = await this.integrationSummaryService.findOneByDate(
 			moment()
 				.add(minus, 'd')
 				.format('YYYY-MM-DD'),
 		);
+		if (yestoday) {
+			priceOfYestoday = yestoday.integrationPrice;
+		}
 		return { price: integrationPrice, priceOfYestoday };
 	}
 

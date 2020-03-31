@@ -75,10 +75,11 @@ export class IntegrationSummaryService {
 	}
 
 	// 根据条件查找单个数据
-	async findOneByDate(date: string): Promise<IIntegrationSummary> {
+	async findOneByDate(date: string) {
 		const data = await this.integrationSummaryModel.findOne({ date }).lean();
 		if (!data) {
-			throw new ApiException('无当前积分价格', ApiErrorCode.NO_EXIST, 404);
+			// throw new ApiException('无当前积分价格', ApiErrorCode.NO_EXIST, 404);
+			return null;
 		}
 		return data;
 	}
