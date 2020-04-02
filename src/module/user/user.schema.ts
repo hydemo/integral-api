@@ -56,6 +56,8 @@ export const UserSchema = new mongoose.Schema(
 		integrationAddress: { type: String },
 		// 邀请人
 		inviteBy: { type: ObjectId },
+		// 团队
+		team: { type: String },
 		// 推广大使级别
 		ambassadorLevel: { type: Number },
 	},

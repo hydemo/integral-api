@@ -160,6 +160,45 @@ export class ApiUserController {
 		return await this.userService.updateVerify(verify, req.user);
 	}
 
+	@Get('/me')
+	@UseGuards(AuthGuard())
+	@ApiOkResponse({
+		description: '获取我的个人信息',
+	})
+	@ApiOperation({ title: '获取我的个人信息', description: '获取我的个人信息' })
+	async me(@Request() req: any): Promise<any> {
+		return {
+			// 注册时间
+			registerTime: req.user.registerTime,
+			// 注册ip
+			registerIp: req.user.registerTime,
+			// 头像
+			avatar: req.user.avatar,
+			// 性别
+			gender: req.user.gender,
+			// 昵称
+			nickname: req.user.nickname,
+			// 禁用时间
+			balance: req.user.balance,
+			// 用户当前积分
+			integration: req.user.integration,
+			// vip有效期
+			vipExpire: req.user.vipExpire,
+			// 是否新用户
+			isNewUser: req.user.isNewUser,
+			// 是否实名认证
+			isVerify: req.user.isVerify,
+			// 积分地址
+			integrationAddress: req.user.integrationAddress,
+			// 邀请人
+			inviteBy: req.user.inviteBy,
+			// 团队
+			team: req.user.team,
+			// 推广大使级别
+			ambassadorLevel: req.user.ambassadorLevel,
+		};
+	}
+
 	@Get('/verify')
 	@UseGuards(AuthGuard())
 	@ApiOkResponse({
@@ -181,6 +220,7 @@ export class ApiUserController {
 				? this.cryptoUtil.signLongString(req.user.cardNumber)
 				: '',
 			bank: req.user.bank,
+			team: req.user.team,
 			bankAddress: req.user.bankAddress,
 			bankNumber: req.user.bankNumber
 				? this.cryptoUtil.signLongString(req.user.bankNumber)

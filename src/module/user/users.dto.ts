@@ -213,6 +213,11 @@ export class VerifyDTO {
 	@ApiModelProperty({ description: '开户行' })
 	readonly bankAddress: string;
 
+	@IsString()
+	@Type(() => String)
+	@ApiModelProperty({ description: '团队' })
+	readonly team: string;
+
 	@IsMobilePhone('zh-CN')
 	@IsDefined()
 	@Type(() => String)

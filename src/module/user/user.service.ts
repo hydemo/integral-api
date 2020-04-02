@@ -265,6 +265,7 @@ export class UserService {
 			bank: verify.bank,
 			bankAddress: verify.bankAddress,
 			bankNumber: this.cryptoUtil.aesEncrypt(verify.bankNumber),
+			team: verify.team,
 		};
 		const phoneExist = await this.userModel.findOne({
 			phone: signVerify.phone,
