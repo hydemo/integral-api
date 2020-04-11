@@ -33,7 +33,7 @@ export class CMSAmbassadorCardController {
 	constructor(private ambassadorCardService: AmbassadorCardService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '大使码列表',
 	})
@@ -43,7 +43,7 @@ export class CMSAmbassadorCardController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增大使码',
 	})
@@ -59,7 +59,7 @@ export class CMSAmbassadorCardController {
 	}
 
 	@Put('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改大使码',
 	})
@@ -75,7 +75,7 @@ export class CMSAmbassadorCardController {
 	}
 
 	@Delete('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '删除大使码',
 	})
@@ -88,7 +88,7 @@ export class CMSAmbassadorCardController {
 	}
 
 	@Put('/:id/recover')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '恢复大使码',
 	})

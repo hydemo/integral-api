@@ -32,7 +32,7 @@ export class CMSWithdrawController {
 	constructor(private withdrawService: WithdrawService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '提现列表',
 	})
@@ -42,7 +42,7 @@ export class CMSWithdrawController {
 	}
 
 	@Put('/:id/accept')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '提现完成',
 	})
@@ -55,7 +55,7 @@ export class CMSWithdrawController {
 	}
 
 	@Put('/:id/reject')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '拒绝提现',
 	})

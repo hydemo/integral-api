@@ -33,7 +33,7 @@ export class CMSIntegrationRateController {
 	constructor(private integrationRateService: IntegrationRateService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '积分收益比重列表',
 	})
@@ -43,7 +43,7 @@ export class CMSIntegrationRateController {
 	}
 
 	@Get('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '积分收益比重详情',
 	})
@@ -53,7 +53,7 @@ export class CMSIntegrationRateController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增积分收益比重',
 	})
@@ -69,7 +69,7 @@ export class CMSIntegrationRateController {
 	}
 
 	@Put('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改积分收益比重',
 	})
@@ -82,7 +82,7 @@ export class CMSIntegrationRateController {
 	}
 
 	@Delete('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '删除积分收益比重',
 	})

@@ -37,7 +37,7 @@ export class CMSCarouselController {
 	) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '轮播图列表',
 	})
@@ -47,7 +47,7 @@ export class CMSCarouselController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增轮播图',
 	})
@@ -63,7 +63,7 @@ export class CMSCarouselController {
 	@ApiOkResponse({
 		description: '删除',
 	})
-	@Roles(1)
+	@Roles(0)
 	@ApiOperation({ title: '删除', description: '删除' })
 	async removeByCarousel(
 		@Param('id', new MongodIdPipe()) id: string,
@@ -75,7 +75,7 @@ export class CMSCarouselController {
 	@ApiOkResponse({
 		description: '修改',
 	})
-	@Roles(1)
+	@Roles(0)
 	@ApiOperation({ title: '修改', description: '修改' })
 	async recoverByCarousel(
 		@Param('id', new MongodIdPipe()) id: string,
@@ -88,7 +88,7 @@ export class CMSCarouselController {
 	@ApiOkResponse({
 		description: '恢复',
 	})
-	@Roles(1)
+	@Roles(0)
 	@ApiOperation({ title: '恢复', description: '恢复' })
 	async recoverByAdmin(
 		@Param('id', new MongodIdPipe()) id: string,

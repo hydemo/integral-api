@@ -34,7 +34,7 @@ export class CMSVipCardController {
 	constructor(@Inject(VipCardService) private vipCardService: VipCardService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '充值卡列表',
 	})
@@ -44,7 +44,7 @@ export class CMSVipCardController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增充值卡',
 	})
@@ -60,7 +60,7 @@ export class CMSVipCardController {
 	@ApiOkResponse({
 		description: '删除',
 	})
-	@Roles(1)
+	@Roles(0)
 	@ApiOperation({ title: '删除', description: '删除' })
 	async removeByVipCard(
 		@Param('id', new MongodIdPipe()) id: string,
@@ -72,7 +72,7 @@ export class CMSVipCardController {
 	@ApiOkResponse({
 		description: '修改',
 	})
-	@Roles(1)
+	@Roles(0)
 	@ApiOperation({ title: '修改', description: '修改' })
 	async recoverByVipCard(
 		@Param('id', new MongodIdPipe()) id: string,
@@ -85,7 +85,7 @@ export class CMSVipCardController {
 	@ApiOkResponse({
 		description: '恢复',
 	})
-	@Roles(1)
+	@Roles(0)
 	@ApiOperation({ title: '恢复', description: '恢复' })
 	async recoverByAdmin(
 		@Param('id', new MongodIdPipe()) id: string,

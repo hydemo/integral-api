@@ -41,7 +41,7 @@ export class CMSServiceFeeController {
 	}
 
 	@Get('/download')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '订单列表',
 	})

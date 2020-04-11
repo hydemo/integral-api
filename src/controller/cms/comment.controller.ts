@@ -34,7 +34,7 @@ export class CMSCommentController {
 	constructor(@Inject(CommentService) private commentService: CommentService) {}
 
 	@Get('/good')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '根据商品获取评论列表',
 	})
@@ -47,7 +47,7 @@ export class CMSCommentController {
 	}
 
 	@Get('/user')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '根据用户获取评论列表',
 	})
@@ -59,7 +59,7 @@ export class CMSCommentController {
 		return await this.commentService.listByUser(pagination);
 	}
 
-	@Roles(1)
+	@Roles(0)
 	@Delete('/:id')
 	@ApiOkResponse({
 		description: '删除评论',
@@ -69,7 +69,7 @@ export class CMSCommentController {
 		return await this.commentService.deleteByAdmin(id);
 	}
 
-	@Roles(1)
+	@Roles(0)
 	@Put('/:id/feedback')
 	@ApiOkResponse({
 		description: '评论回复',

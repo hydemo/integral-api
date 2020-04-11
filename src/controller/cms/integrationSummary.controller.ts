@@ -47,7 +47,7 @@ export class CMSIntegrationSummaryController {
 	}
 
 	@Put('/amount')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改承兑池',
 	})

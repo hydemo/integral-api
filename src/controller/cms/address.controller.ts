@@ -32,7 +32,7 @@ export class CMSAddressController {
 	constructor(@Inject(AddressService) private addressService: AddressService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '收货地址列表',
 	})
@@ -42,7 +42,7 @@ export class CMSAddressController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '添加收货地址',
 	})
@@ -52,7 +52,7 @@ export class CMSAddressController {
 	}
 
 	@Put('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改收货地址',
 	})
@@ -65,7 +65,7 @@ export class CMSAddressController {
 	}
 
 	@Delete('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '删除收货地址',
 	})

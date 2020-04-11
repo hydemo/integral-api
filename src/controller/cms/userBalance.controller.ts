@@ -34,7 +34,7 @@ export class CMSUserBalanceController {
 		@Inject(UserBalanceService) private userBalanceService: UserBalanceService,
 	) {}
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '用户余额列表',
 	})

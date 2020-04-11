@@ -33,7 +33,7 @@ export class CMSLogController {
 	constructor(private logService: LogService) {}
 
 	@Get('/')
-	@Roles(0)
+	@Roles(1)
 	@ApiOkResponse({
 		description: '日志列表',
 	})

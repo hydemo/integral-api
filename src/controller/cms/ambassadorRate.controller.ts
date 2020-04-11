@@ -33,7 +33,7 @@ export class CMSAmbassadorRateController {
 	constructor(private ambassadorRateService: AmbassadorRateService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '大使分发比例列表',
 	})
@@ -43,7 +43,7 @@ export class CMSAmbassadorRateController {
 	}
 
 	@Get('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '大使分发比例详情',
 	})
@@ -53,7 +53,7 @@ export class CMSAmbassadorRateController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增大使分发比例',
 	})
@@ -69,7 +69,7 @@ export class CMSAmbassadorRateController {
 	}
 
 	@Put('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改大使分发比例',
 	})
@@ -82,7 +82,7 @@ export class CMSAmbassadorRateController {
 	}
 
 	@Delete('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '删除大使分发比例',
 	})

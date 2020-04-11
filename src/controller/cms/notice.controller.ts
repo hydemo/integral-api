@@ -33,7 +33,7 @@ export class CMSNoticeController {
 	constructor(private noticeService: NoticeService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '订单通知列表',
 	})
@@ -43,7 +43,7 @@ export class CMSNoticeController {
 	}
 
 	@Get('/id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '订单通知详情',
 	})
@@ -53,7 +53,7 @@ export class CMSNoticeController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增订单通知',
 	})
@@ -66,7 +66,7 @@ export class CMSNoticeController {
 	}
 
 	@Put('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改订单通知',
 	})
@@ -79,7 +79,7 @@ export class CMSNoticeController {
 	}
 
 	@Delete('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '删除订单通知',
 	})
@@ -92,7 +92,7 @@ export class CMSNoticeController {
 	}
 
 	@Put('/:id/recover')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '恢复订单通知',
 	})
@@ -102,7 +102,7 @@ export class CMSNoticeController {
 	}
 
 	@Put('/:id/phoneNotice')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改短信通知权限',
 	})
@@ -115,7 +115,7 @@ export class CMSNoticeController {
 	}
 
 	@Put('/:id/weixinNotice')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改微信通知权限',
 	})

@@ -33,7 +33,7 @@ export class CMSCouponController {
 	constructor(private couponService: CouponService) {}
 
 	@Get('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '红包/优惠券列表',
 	})
@@ -43,7 +43,7 @@ export class CMSCouponController {
 	}
 
 	@Get('/id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '红包/优惠券详情',
 	})
@@ -53,7 +53,7 @@ export class CMSCouponController {
 	}
 
 	@Post('/')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '新增红包/优惠券',
 	})
@@ -66,7 +66,7 @@ export class CMSCouponController {
 	}
 
 	@Put('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改红包/优惠券',
 	})
@@ -79,7 +79,7 @@ export class CMSCouponController {
 	}
 
 	@Delete('/:id')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '删除红包/优惠券',
 	})
@@ -92,7 +92,7 @@ export class CMSCouponController {
 	}
 
 	@Put('/:id/recover')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '恢复红包/优惠券',
 	})

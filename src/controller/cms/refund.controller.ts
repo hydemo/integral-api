@@ -64,7 +64,7 @@ export class CMSRefundController {
 	}
 
 	@Put('/:id/confirm')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '通过审核',
 	})
@@ -77,7 +77,7 @@ export class CMSRefundController {
 	}
 
 	@Put('/:id/refund')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '确认收货',
 	})
@@ -87,7 +87,7 @@ export class CMSRefundController {
 	}
 
 	@Put('/:id/address')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改地址',
 	})
@@ -100,7 +100,7 @@ export class CMSRefundController {
 	}
 
 	@Put('/:id/refuse')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '拒绝',
 	})
@@ -113,7 +113,7 @@ export class CMSRefundController {
 	}
 
 	@Put('/:id/price')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '修改价格',
 	})
@@ -126,7 +126,7 @@ export class CMSRefundController {
 	}
 
 	@Get('/:id/traces')
-	@Roles(1)
+	@Roles(0)
 	@ApiOkResponse({
 		description: '物流信息',
 	})
