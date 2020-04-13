@@ -125,6 +125,32 @@ export class IntegrationService {
 		return { list, total };
 	}
 
+	async invites(pagination: Pagination, user: string) {
+		const invites = await this.userService.list(pagination, user);
+		const list = await Promise.all(
+			invites.list.map(async invite => {
+				const integrations = await this.integrationModel.find({
+					sourceUser: invite._id,
+					user,
+					type: 2,
+				});
+				let amount = 0;
+				let integration = 0;
+				integrations.map(int => {
+					(amount += int.amount), (integration += int.count);
+				});
+				return {
+					_id: invite._id,
+					avatar: invite.avatar,
+					nickname: invite.nickname,
+					amount: amount.toFixed(2),
+					integration: integration.toFixed(2),
+				};
+			}),
+		);
+		return { list, total: invites.total };
+	}
+
 	// 赠送积分
 	async giveIntegration(user: IUser, address: string, integration: number) {
 		if (integration < 0) {

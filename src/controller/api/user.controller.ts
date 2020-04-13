@@ -239,7 +239,7 @@ export class ApiUserController {
 		@Query() pagination: Pagination,
 		@Request() req: any,
 	): Promise<any> {
-		return this.integrationService.listByUser(pagination, 2, req.user._id);
+		return this.integrationService.invites(pagination, req.user._id);
 	}
 
 	@Get('/integrations/share')
