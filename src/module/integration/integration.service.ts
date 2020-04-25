@@ -93,17 +93,13 @@ export class IntegrationService {
 	// 分页查询数据
 	async listByUser(
 		pagination: Pagination,
-		sourceType: number,
 		user: string,
+		sourceType?: number,
 	): Promise<IList<IIntegration>> {
 		const condition = this.paginationUtil.genCondition(pagination, []);
 		condition.user = user;
-		if (sourceType === 2) {
+		if (sourceType) {
 			condition.sourceType = sourceType;
-		} else if (sourceType === 3 || sourceType === 4) {
-			condition.sourceType = sourceType;
-		} else {
-			throw new ApiException('参数有误', ApiErrorCode.INPUT_ERROR, 406);
 		}
 		const list = await this.integrationModel
 			.find(condition)

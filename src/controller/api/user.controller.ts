@@ -17,7 +17,6 @@ import {
 	ApiOperation,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { VipCardService } from 'src/module/vipCard/vipCard.service';
 import {
 	VipCardDTO,
 	VerifyDTO,
@@ -28,20 +27,20 @@ import { UserService } from 'src/module/user/user.service';
 import { CryptoUtil } from 'src/utils/crypto.util';
 import { IntegrationService } from 'src/module/integration/integration.service';
 import { Pagination } from 'src/common/dto/pagination.dto';
-import { GoodService } from 'src/module/good/good.service';
 import { ExchangeDTO } from 'src/module/integration/integration.dto';
 import { CreateWithdrawDTO } from 'src/module/withdraw/withdraw.dto';
 import { WithdrawService } from 'src/module/withdraw/withdraw.service';
 import { AmbassadorCardService } from 'src/module/ambassadorCard/ambassadorCard.service';
 import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
+import { UserBalanceService } from 'src/module/userBalance/userBalance.service';
 
 @ApiUseTags('user')
 @ApiForbiddenResponse({ description: 'Unauthorized' })
 @Controller('users')
 export class ApiUserController {
 	constructor(
-		@Inject(VipCardService) private vipCardService: VipCardService,
 		@Inject(UserService) private userService: UserService,
+		@Inject(UserBalanceService) private uerBalanceService: UserBalanceService,
 		@Inject(IntegrationService) private integrationService: IntegrationService,
 		@Inject(CryptoUtil) private cryptoUtil: CryptoUtil,
 		@Inject(WithdrawService) private withdrawService: WithdrawService,
@@ -55,8 +54,21 @@ export class ApiUserController {
 		description: '余额',
 	})
 	@ApiOperation({ title: '余额', description: '余额' })
-	async list(@Request() req: any): Promise<any> {
+	async balance(@Request() req: any): Promise<any> {
 		return req.user.balance;
+	}
+
+	@Get('/balance/list')
+	@UseGuards(AuthGuard())
+	@ApiOkResponse({
+		description: '余额',
+	})
+	@ApiOperation({ title: '余额', description: '余额' })
+	async balances(
+		@Request() req: any,
+		@Query() pagination: Pagination,
+	): Promise<any> {
+		return this.uerBalanceService.listByUser(pagination, req.user._id);
 	}
 
 	@Get('/address')
@@ -77,6 +89,19 @@ export class ApiUserController {
 	@ApiOperation({ title: '用户积分', description: '用户积分' })
 	async integration(@Request() req: any): Promise<any> {
 		return { integration: req.user.integration };
+	}
+
+	@Get('/integration/list')
+	@UseGuards(AuthGuard())
+	@ApiOkResponse({
+		description: '用户积分历史',
+	})
+	@ApiOperation({ title: '用户积分历史', description: '用户积分历史' })
+	async integrations(
+		@Request() req: any,
+		@Query() pagination: Pagination,
+	): Promise<any> {
+		return this.integrationService.listByUser(pagination, req.user._id);
 	}
 
 	@Post('/integration')
@@ -108,18 +133,6 @@ export class ApiUserController {
 	): Promise<any> {
 		return await this.integrationService.exchange(req.user, integration.count);
 	}
-
-	// @Post('/vipCard')
-	// @ApiOkResponse({
-	// 	description: '使用会员卡',
-	// })
-	// @ApiOperation({ title: '使用会员卡', description: '使用会员卡' })
-	// async vipCard(
-	// 	@Body() vipCard: VipCardDTO,
-	// 	@Request() req: any,
-	// ): Promise<any> {
-	// 	return await this.vipCardService.useVipCard(vipCard, req.user._id);
-	// }
 
 	@Post('/ambassador')
 	@UseGuards(AuthGuard())
@@ -252,7 +265,7 @@ export class ApiUserController {
 		@Query() pagination: Pagination,
 		@Request() req: any,
 	): Promise<any> {
-		return this.integrationService.listByUser(pagination, 3, req.user._id);
+		return this.integrationService.listByUser(pagination, req.user._id, 3);
 	}
 
 	@Get('/integrations/goods')
@@ -265,7 +278,7 @@ export class ApiUserController {
 		@Query() pagination: Pagination,
 		@Request() req: any,
 	): Promise<any> {
-		return this.integrationService.listByUser(pagination, 4, req.user._id);
+		return this.integrationService.listByUser(pagination, req.user._id, 4);
 	}
 
 	@Get('/withdraws')
