@@ -828,7 +828,7 @@ export class OrderService {
 	async completeOrder() {
 		await this.orderModel.updateMany(
 			{
-				sendTime: { $lte: moment().add(-15, 'd') },
+				sendTime: { $lte: moment().add(-5, 'd') },
 				checkResult: 3,
 				isDelete: false,
 			},
@@ -836,7 +836,7 @@ export class OrderService {
 		);
 		const completeOrders = await this.orderModel
 			.find({
-				receiveTime: { $lte: moment().add(-7, 'd') },
+				receiveTime: { $lte: moment().add(-5, 'd') },
 				checkResult: 4,
 				isDelete: false,
 			})
