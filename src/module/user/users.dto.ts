@@ -256,6 +256,11 @@ export class UpdateVerifyDTO {
 	@Type(() => String)
 	@ApiModelPropertyOptional({ description: '手机号' })
 	readonly phone: string;
+
+	@IsString()
+	@Type(() => String)
+	@ApiModelProperty({ description: '团队' })
+	readonly team: string;
 }
 
 export class InviteUserDTO {
