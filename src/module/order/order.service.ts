@@ -658,6 +658,7 @@ export class OrderService {
 		good: string,
 		goodCount: number,
 		sourceUser: string,
+		hasRecommendUser?: boolean,
 	): Promise<number> {
 		const {
 			integrationPrice,
@@ -676,24 +677,27 @@ export class OrderService {
 			throw new ApiException('积分价格有误', ApiErrorCode.INTERNAL_ERROR, 500);
 		}
 		const integrationRates = await this.integrationRateService.getRate();
-		const rate = integrationRates[sourceType];
+
+		let rate = integrationRates[sourceType];
+		if (sourceType === 2 && integrationRates[7] && !hasRecommendUser) {
+			rate = integrationRates[7];
+		}
 		const vipRate = integrationRates[`vip_${sourceType}`];
 
 		let isVip = false;
 		let ambassadorLevel = 0;
 		let amount = Number(((serviceFee * rate) / 100).toFixed(2));
 
-		if (
-			integrationUser &&
-			integrationUser.ambassadorLevel &&
-			sourceType === 3
-		) {
+		if (integrationUser && integrationUser.ambassadorLevel) {
 			ambassadorLevel = integrationUser.ambassadorLevel;
 			isVip = false;
 			const ambassadorRates = await this.ambassadorRateService.getRate(
 				ambassadorLevel,
 			);
-			const ambassadorRate = ambassadorRates[sourceType];
+			let ambassadorRate = ambassadorRates[sourceType];
+			if (sourceType === 2 && ambassadorRate[7] && !hasRecommendUser) {
+				ambassadorRate = ambassadorRate[7];
+			}
 			amount = Number(((serviceFee * ambassadorRate) / 100).toFixed(2));
 		}
 		if (vipRate) {
@@ -734,6 +738,7 @@ export class OrderService {
 	async assignIntegration(order: IOrder) {
 		let serviceFeeTotal = 0;
 		let serviceFeeMinus = 0;
+		let hasRecommendUser = false;
 		await Promise.all(
 			order.products.map(async product => {
 				if (!product.product.serviceFee) {
@@ -745,6 +750,7 @@ export class OrderService {
 				serviceFeeTotal += serviceFee;
 				// 商品推广人积分发放
 				if (product.recommendUser) {
+					hasRecommendUser = true;
 					serviceFeeMinus += await this.createIntegration(
 						serviceFee,
 						order._id,
@@ -789,6 +795,7 @@ export class OrderService {
 				'',
 				0,
 				order.user._id,
+				hasRecommendUser,
 			);
 		}
 		// 平台服务费额外发放

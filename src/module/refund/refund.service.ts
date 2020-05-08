@@ -127,6 +127,14 @@ export class RefundService {
 			checkResult: 1,
 		});
 	}
+
+	// 统计数量
+	async countByAdmin() {
+		return await this.refundModel.countDocuments({
+			isDelete: false,
+			checkResult: 1,
+		});
+	}
 	// 确认退款
 	async confirm(id: string, address: CreateAddressDTO) {
 		const refund: IRefund | null = await this.refundModel

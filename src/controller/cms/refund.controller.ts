@@ -53,6 +53,16 @@ export class CMSRefundController {
 		return await this.refundService.list(pagination);
 	}
 
+	@Get('/count')
+	@Roles(0)
+	@ApiOkResponse({
+		description: '物流信息',
+	})
+	@ApiOperation({ title: '物流信息', description: '物流信息' })
+	async count(@Param('id', new MongodIdPipe()) id: string): Promise<any> {
+		return await this.refundService.countByAdmin();
+	}
+
 	@Get('/:id')
 	@Roles(1)
 	@ApiOkResponse({
