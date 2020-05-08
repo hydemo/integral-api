@@ -128,7 +128,7 @@ export class IntegrationService {
 				const integrations = await this.integrationModel.find({
 					sourceUser: invite._id,
 					user,
-					type: 2,
+					sourceType: 2,
 				});
 				let amount = 0;
 				let integration = 0;
