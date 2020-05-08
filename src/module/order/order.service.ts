@@ -375,13 +375,14 @@ export class OrderService {
 		if (String(order.user) !== String(user._id)) {
 			throw new ApiException('无权限', ApiErrorCode.NO_PERMISSION, 403);
 		}
-		if (order.checkResult !== 3) {
-			throw new ApiException('订单有误', ApiErrorCode.NO_PERMISSION, 403);
-		}
-		return await this.orderModel.findByIdAndUpdate(id, {
+		// if (order.checkResult !== 3) {
+		// 	throw new ApiException('订单有误', ApiErrorCode.NO_PERMISSION, 403);
+		// }
+		await this.orderModel.findByIdAndUpdate(id, {
 			checkResult: 4,
 			receiveTime: Date.now(),
 		});
+		await this.complete(id, user._id);
 	}
 
 	// 订单发货
@@ -828,7 +829,7 @@ export class OrderService {
 	async completeOrder() {
 		await this.orderModel.updateMany(
 			{
-				sendTime: { $lte: moment().add(-5, 'd') },
+				sendTime: { $lte: moment().add(-3, 'd') },
 				checkResult: 3,
 				isDelete: false,
 			},
@@ -836,7 +837,7 @@ export class OrderService {
 		);
 		const completeOrders = await this.orderModel
 			.find({
-				receiveTime: { $lte: moment().add(-5, 'd') },
+				receiveTime: { $lte: moment().add(-15, 'd') },
 				checkResult: 4,
 				isDelete: false,
 			})

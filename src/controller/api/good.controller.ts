@@ -137,7 +137,10 @@ export class ApiGoodController {
 		if (headers.authorization) {
 			const token = headers.authorization.replace('Bearer', '').trim();
 			if (token) {
-				const payload = this.jwtService.verify(token);
+				let payload: any = {};
+				try {
+					payload = this.jwtService.verify(token);
+				} catch (error) {}
 				if (payload.type === 'user') {
 					const collect = await this.collectService.findOne({
 						user: payload.id,

@@ -103,7 +103,7 @@ export class LogService {
 			return null;
 		}
 		const key = urls[2];
-		const object = eunms[key];
+		const object = eunms[key] || {};
 		// 承兑池修改特殊处理
 		if (
 			method === 'PUT' &&

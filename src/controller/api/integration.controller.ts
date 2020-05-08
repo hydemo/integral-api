@@ -66,7 +66,10 @@ export class ApiIntegrationController {
 		if (headers.authorization) {
 			const token = headers.authorization.replace('Bearer', '').trim();
 			if (token) {
-				const payload = this.jwtService.verify(token);
+				let payload: any = {};
+				try {
+					payload = this.jwtService.verify(token);
+				} catch (error) {}
 				if (payload.type === 'user') {
 					const user = await this.userService.findById(payload.id);
 					if (user && user.ambassadorLevel) {
