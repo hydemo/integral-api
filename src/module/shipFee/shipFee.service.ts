@@ -85,11 +85,11 @@ export class ShipFeeService {
 			province,
 		});
 		if (!shipFee) {
-			return fee < 29 ? 12 : 0;
+			return 0;
 		}
 		if (shipFee.limit > fee) {
 			return shipFee.fee;
 		}
-		return fee < 29 ? 12 : 0;
+		return 0;
 	}
 }
