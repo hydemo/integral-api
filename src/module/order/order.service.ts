@@ -232,7 +232,7 @@ export class OrderService {
 				await this.productServicee.incStock(product.product, -product.count);
 			}),
 		);
-		let shippingFee = order.orderPrice < 29 ? 12 : 0;
+		let shippingFee = 0;
 		let update: any = {
 			checkResult: 1,
 			actualPrice: order.actualPrice,
@@ -437,7 +437,7 @@ export class OrderService {
 		const address: IAddress | null = await this.addressService.findByUser(
 			user._id,
 		);
-		let shippingFee = orderPrice < 29 ? 12 : 0;
+		let shippingFee = 0;
 		if (address) {
 			shippingFee = await this.shipFeeService.getShipFee(
 				address.province,
