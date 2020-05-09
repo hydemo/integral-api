@@ -224,6 +224,7 @@ export class UserService {
 			bankNumber: user.bankNumber
 				? this.cryptoUtil.aesDecrypt(user.bankNumber)
 				: '',
+			team: user.team,
 		};
 	}
 
