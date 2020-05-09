@@ -60,8 +60,8 @@ export class ApiIntegrationController {
 	@ApiOperation({ title: '积分比例', description: '积分比例' })
 	async getRate(@Request() req: any): Promise<any> {
 		const integrationRate = await this.integrationRateService.getRate();
-		const buyRate = integrationRate[1];
-		let shareRate = integrationRate[3];
+		let buyRate = integrationRate[1] || 0;
+		let shareRate = integrationRate[3] || 0;
 		const headers = req.headers;
 		if (headers.authorization) {
 			const token = headers.authorization.replace('Bearer', '').trim();
@@ -76,11 +76,17 @@ export class ApiIntegrationController {
 						const ambassadorRate = await this.ambassadorRateService.getRate(
 							user.ambassadorLevel,
 						);
-						shareRate = ambassadorRate[3];
+						if (ambassadorRate[1]) {
+							buyRate = ambassadorRate[1];
+						}
+						if (ambassadorRate[3]) {
+							shareRate = ambassadorRate[3];
+						}
 					}
 				}
 			}
 		}
+		console.log(buyRate, shareRate, 'sss');
 		return { buyRate, shareRate };
 	}
 }
