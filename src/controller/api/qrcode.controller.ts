@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Inject } from '@nestjs/common';
+import { Controller, Get, Param, Inject } from '@nestjs/common';
 import {
 	ApiUseTags,
 	ApiOkResponse,
@@ -6,15 +6,12 @@ import {
 	ApiOperation,
 	ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { KDBirdUtil } from 'src/utils/kdbird.util';
 import { MongodIdPipe } from 'src/common/pipe/mongodId.pipe';
 import { WeixinQrcodeService } from 'src/module/weixinQrcode/weixinQrcode.service';
 
 @ApiUseTags('qrcode')
 @ApiBearerAuth()
 @ApiForbiddenResponse({ description: 'Unauthorized' })
-@UseGuards(AuthGuard())
 @Controller('qrcodes')
 export class ApiQrcodeController {
 	constructor(
