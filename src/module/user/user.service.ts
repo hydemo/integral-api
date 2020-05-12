@@ -112,6 +112,7 @@ export class UserService {
 	}
 
 	async loginByWeixin(login: LoginDTO, ip: string): Promise<any> {
+		let inviteBy = '';
 		// 解释用户数据
 		const userInfo = await this.weixinUtil.login(login.code, login);
 		if (!userInfo) {
@@ -122,8 +123,8 @@ export class UserService {
 			inviteUser = await this.userModel
 				.findById(login.inviteBy)
 				.select({ _id: 1, nickname: 1, avatar: 1 });
-			if (!inviteUser) {
-				throw new ApiException('邀请人不存在', ApiErrorCode.NO_EXIST, 404);
+			if (inviteUser) {
+				inviteBy = login.inviteBy;
 			}
 		}
 		// 根据openid查找用户是否已经注册
@@ -153,8 +154,7 @@ export class UserService {
 			})
 			.exec();
 		if (!user) {
-			// 注册
-			user = await this.userModel.create({
+			const createUser = {
 				registerTime: Date.now(),
 				registerIp: ip,
 				weixinOpenid: userInfo.openId,
@@ -162,8 +162,11 @@ export class UserService {
 				gender: userInfo.gender || 0, // 性别 0：未知、1：男、2：女
 				nickname: userInfo.nickName,
 				integrationAddress: this.cryptoUtil.createBitcoinAddress(),
-				inviteBy: login.inviteBy,
-			});
+				inviteBy,
+			};
+			console.log(createUser, 'ttt');
+			// 注册
+			user = await this.userModel.create(createUser);
 			const client = this.redis.getClient();
 			user.inviteBy = inviteUser;
 
