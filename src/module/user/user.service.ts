@@ -128,7 +128,7 @@ export class UserService {
 			}
 		}
 		// 根据openid查找用户是否已经注册
-		let user: IUser = await this.userModel
+		let user: any = await this.userModel
 			.findOne({ weixinOpenid: userInfo.openId })
 			.select({
 				// 姓名
@@ -164,11 +164,11 @@ export class UserService {
 				integrationAddress: this.cryptoUtil.createBitcoinAddress(),
 				inviteBy,
 			};
-			console.log(createUser, 'ttt');
 			// 注册
 			user = await this.userModel.create(createUser);
 			const client = this.redis.getClient();
-			user.inviteBy = inviteUser;
+			// user.inviteBy = inviteUser;z
+			user = { ...user, inviteBy: inviteUser };
 
 			await client.hincrby('dataRecord', 'users', 1);
 		}
