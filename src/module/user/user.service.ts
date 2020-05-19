@@ -154,7 +154,7 @@ export class UserService {
 			})
 			.exec();
 		if (!user) {
-			const createUser = {
+			const createUser: any = {
 				registerTime: Date.now(),
 				registerIp: ip,
 				weixinOpenid: userInfo.openId,
@@ -162,8 +162,10 @@ export class UserService {
 				gender: userInfo.gender || 0, // 性别 0：未知、1：男、2：女
 				nickname: userInfo.nickName,
 				integrationAddress: this.cryptoUtil.createBitcoinAddress(),
-				inviteBy,
 			};
+			if (inviteBy) {
+				createUser.inviteBy = inviteBy;
+			}
 			// 注册
 			user = await this.userModel.create(createUser);
 			const client = this.redis.getClient();

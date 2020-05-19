@@ -86,7 +86,6 @@ export class ApiIntegrationController {
 				}
 			}
 		}
-		console.log(buyRate, shareRate, 'sss');
 		return { buyRate, shareRate };
 	}
 }
