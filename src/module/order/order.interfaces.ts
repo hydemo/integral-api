@@ -53,6 +53,7 @@ export interface IOrder extends Document {
 	readonly integration: number;
 	// 积分抵扣金额
 	readonly integrationAmount: number;
+	noShip: boolean;
 }
 
 export interface IOrderProduct {
@@ -67,4 +68,5 @@ export interface IOrderProduct {
 	readonly vipMinus: number;
 	// 推荐人
 	readonly recommendUser: string;
+	noShip: boolean;
 }

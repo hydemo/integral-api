@@ -23,6 +23,7 @@ export const OrderSchema = new mongoose.Schema(
 				discountMinus: Number,
 				vipMinus: Number,
 				recommendUser: ObjectId,
+				noShip: Boolean,
 			},
 		],
 		// 状态 0:待确认 1:待付款 2:待发货 3：待收货 4:待评价 5:完成 6:退款
@@ -96,6 +97,8 @@ export const OrderSchema = new mongoose.Schema(
 		shop: { type: String },
 		// 商家留言
 		message: { type: String },
+		// 无需配送
+		noShip: { type: Boolean, default: false },
 	},
 	{ collection: 'order', versionKey: false, timestamps: true },
 );

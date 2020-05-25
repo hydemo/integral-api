@@ -60,4 +60,5 @@ export interface IGood extends Document {
 	readonly goodSpecifications: IGoodSpecification[];
 	products: IProduct[];
 	collect: boolean;
+	noShip: boolean;
 }

@@ -62,6 +62,11 @@ export class CreateGoodDTO {
 	@ApiModelPropertyOptional({ description: '是否热销' })
 	readonly isHot: boolean;
 
+	@IsBoolean()
+	@Type(() => Boolean)
+	@ApiModelPropertyOptional({ description: '无需快递' })
+	readonly noShip: boolean;
+
 	@IsNumber()
 	@Type(() => Number)
 	@ApiModelProperty({ description: '销量基数' })

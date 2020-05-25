@@ -127,6 +127,10 @@ export class OrderService {
 		if (!good) {
 			throw new ApiException('商品不存在', ApiErrorCode.NO_EXIST, 406);
 		}
+		let noShip = false;
+		if (good.noShip) {
+			noShip = true;
+		}
 		const orderProduct: OrderProductDTO = {
 			product: id,
 			count,
@@ -137,6 +141,7 @@ export class OrderService {
 			preSaleMinus: 0,
 			discountMinus: 0,
 			vipMinus: 0,
+			noShip,
 		};
 
 		if (recommendUser) {
@@ -221,7 +226,8 @@ export class OrderService {
 		if (!order) {
 			throw new ApiException('订单不存在', ApiErrorCode.NO_EXIST, 406);
 		}
-		if (!confirm.address && !order.consignee) {
+
+		if (!confirm.address && !order.consignee && !order.noShip) {
 			throw new ApiException('收获地址不能为空', ApiErrorCode.NO_EXIST, 406);
 		}
 		if (order.checkResult !== 0 || String(order.user) !== String(user._id)) {
@@ -416,7 +422,12 @@ export class OrderService {
 		let preSaleMinus = 0;
 		let vipMinus = 0;
 		let discountMinus = 0;
+		let noShipCount = 0;
+		let noShip = false;
 		for (const product of products) {
+			if (product.noShip) {
+				noShipCount += 1;
+			}
 			goodsPrice += Number((product.realPrice * product.count).toFixed(2));
 			promoteMinus += Number((product.promoteMinus * product.count).toFixed(2));
 			preSaleMinus += Number((product.preSaleMinus * product.count).toFixed(2));
@@ -424,6 +435,9 @@ export class OrderService {
 				(product.discountMinus * product.count).toFixed(2),
 			);
 			vipMinus += Number((product.vipMinus * product.count).toFixed(2));
+		}
+		if (noShipCount === products.length) {
+			noShip = true;
 		}
 		const orderPrice = Number(
 			(
@@ -434,16 +448,18 @@ export class OrderService {
 				discountMinus
 			).toFixed(2),
 		);
-		const address: IAddress | null = await this.addressService.findByUser(
-			user._id,
-		);
 		let shippingFee = 0;
-		if (address) {
-			shippingFee = await this.shipFeeService.getShipFee(
-				address.province,
-				orderPrice,
-			);
+		let address: any = '';
+		if (!noShip) {
+			address = await this.addressService.findByUser(user._id);
+			if (address) {
+				shippingFee = await this.shipFeeService.getShipFee(
+					address.province,
+					orderPrice,
+				);
+			}
 		}
+
 		const newOrder: OrderDTO = {
 			// 订单号
 			orderSn: this.getOrderSn(),
@@ -491,6 +507,7 @@ export class OrderService {
 			preSaleMinus,
 			// 配送方式
 			shipType: 1,
+			noShip,
 		};
 		return await this.orderModel.create(newOrder);
 	}
@@ -1084,17 +1101,30 @@ export class OrderService {
 		);
 		await this.userRecordService.genRecord(order.user, order);
 		const payTime = Date.now();
-		await this.orderModel
-			.findByIdAndUpdate(order._id, {
-				checkResult: 2,
-				payTime,
-				transactionId,
-				payType,
-			})
-			.lean()
-			.exec();
-		await this.sendNotice(order, payTime);
-		return order;
+		if (order.noShip) {
+			await this.orderModel
+				.findByIdAndUpdate(order._id, {
+					checkResult: 4,
+					payTime,
+					transactionId,
+					payType,
+				})
+				.lean()
+				.exec();
+			return order;
+		} else {
+			await this.orderModel
+				.findByIdAndUpdate(order._id, {
+					checkResult: 2,
+					payTime,
+					transactionId,
+					payType,
+				})
+				.lean()
+				.exec();
+			await this.sendNotice(order, payTime);
+			return order;
+		}
 	}
 
 	// 评论

@@ -157,6 +157,7 @@ export class OrderDTO {
 	@Type(() => String)
 	@ApiModelProperty({ description: '自提点' })
 	readonly shop?: string;
+	noShip: boolean;
 }
 
 export class OrderProductDTO {
@@ -170,4 +171,5 @@ export class OrderProductDTO {
 	readonly discountMinus: number;
 	readonly vipMinus: number;
 	recommendUser?: string;
+	readonly noShip: boolean;
 }
