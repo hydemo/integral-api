@@ -9,7 +9,7 @@
     followSymlinks: false
   error_file: ./log/integral-error.log
   out_file: ./log/integral-out.log
-  pid_file: ./log/integral-piZd.log
+  pid_file: ./log/integral-pid.log
   log_date_format: YYYY-MM-DD HH:mm:ss
   env:
     NODE_ENV: production

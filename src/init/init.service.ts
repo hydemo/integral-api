@@ -16,7 +16,7 @@ export class InitService {
 	async init() {
 		const token = await this.jwtService.sign({
 			type: 'user',
-			id: '5e82cde98a77af612485ff60',
+			id: '5e82e712fab344695bd613cc',
 		});
 		console.log(token);
 		await this.integrationSummaryService.init();

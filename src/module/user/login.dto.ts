@@ -9,7 +9,7 @@ export class LoginDTO {
 
 	@IsString()
 	@Type(() => String)
-	@ApiModelProperty({ description: 'rawdata' })
+	@ApiModelProperty({ description: 'errMsg' })
 	readonly errMsg: string;
 
 	@IsString()

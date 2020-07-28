@@ -96,6 +96,14 @@ export class AddressService {
 			.exec();
 	}
 
+	// 根据用户查找数据
+	async findById(id: string): Promise<IAddress | null> {
+		return await this.addressModel
+			.findById(id)
+			.lean()
+			.exec();
+	}
+
 	// 设为默认值
 	async setDefault(id: string, user: string): Promise<boolean> {
 		const address = await this.addressModel

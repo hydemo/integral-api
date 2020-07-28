@@ -68,7 +68,7 @@ export class ApiIntegrationController {
 			if (token) {
 				let payload: any = {};
 				try {
-					payload = this.jwtService.verify(token);
+					payload = await this.jwtService.verify(token);
 				} catch (error) {}
 				if (payload.type === 'user') {
 					const user = await this.userService.findById(payload.id);

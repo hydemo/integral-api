@@ -247,10 +247,10 @@ export class OrderService {
 			shipType: confirm.shipType,
 		};
 		if (confirm.address) {
-			const address: IAddress | null = await this.addressService.findByUser(
-				user._id,
+			const address: IAddress | null = await this.addressService.findById(
+				confirm.address,
 			);
-			if (!address) {
+			if (!address || String(address.user) !== String(user._id)) {
 				throw new ApiException('地址不对', ApiErrorCode.NO_EXIST, 406);
 			}
 			if (confirm.shipType === 1) {
