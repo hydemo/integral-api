@@ -275,7 +275,7 @@ export class WeixinUtil {
 	 * @param id 退款单号id
 	 * @returns {Promise}
 	 */
-	async refund(fee: number, order: string, refund: string) {
+	async refund(fee: number, order: string, refund: string, refundFee: number) {
 		const pfx = fs.readFileSync('apiclient_cert.p12');
 		const config = {
 			appid: this.config.appid,
@@ -292,7 +292,7 @@ export class WeixinUtil {
 				// transaction_id: '微信的订单号',
 				out_trade_no: String(order),
 				out_refund_no: String(refund),
-				total_fee: Number((fee * 100).toFixed(0)),
+				total_fee: Number((refundFee * 100).toFixed(0)),
 				// total_fee: 1,
 				// refund_fee: 1,
 				refund_fee: Number((fee * 100).toFixed(0)),

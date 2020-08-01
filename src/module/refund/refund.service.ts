@@ -486,7 +486,8 @@ export class RefundService {
 			const result: any = await this.weixinUtil.refund(
 				refund.refundPrice,
 				order.paySn,
-				refund._id,
+				refund.refundSn,
+				order.actualPrice,
 			);
 			if (!result) {
 				throw new ApiException('退款失败', ApiErrorCode.NO_EXIST, 406);
