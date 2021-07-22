@@ -61,7 +61,7 @@
 		"tenpay": "^2.1.18",
 		"typescript": "^3.0.1",
 		"weixinpay": "^1.0.12",
-		"xlsx": "^0.15.6"
+		"xlsx": "^0.17.0"
 	},
 	"devDependencies": {
 		"@nestjs/testing": "^5.1.0",
